@@ -10,7 +10,7 @@ This is the opening module of the course. A student enters a handful of assumpti
 
 ```
 week1-build-your-financial-life/
-├── financial-life-model.html                  # interactive single-file web app
+├── index.html                  # interactive single-file web app
 ├── financial-life-model.xlsx   # live spreadsheet model (formulas, not hardcoded)
 └── README.md                   # this file
 ```
@@ -21,7 +21,7 @@ week1-build-your-financial-life/
 
 The two artifacts implement the **same model**. They serve different pedagogical purposes: the app builds intuition and is ideal for live demonstration; the spreadsheet makes every calculation auditable and is ideal for homework and "open the hood" sessions.
 
-### `financial-life-model.html` — interactive web app
+### `index.html` — interactive web app
 
 A single, self-contained HTML file (no build step, no server). A student adjusts the eight inputs and the model recomputes instantly, presenting:
 
