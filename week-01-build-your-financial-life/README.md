@@ -72,7 +72,6 @@ By the end of this module, a student should be able to:
 3. **Interpret** human capital as the present value of future earnings and explain why the human-to-financial capital crossover is the central event of a saver's life.
 4. **Apply** the Life-Cycle and Permanent Income Hypotheses to predict how consumption and saving should behave across the life cycle, and compare that benchmark to an actual (non-smoothed) consumption path.
 5. **Assess** retirement adequacy — whether a corpus sustains a target lifestyle, and how sensitive the answer is to growth, return, and inflation assumptions.
-6. **Critique** the model: identify which simplifications bias the result and propose principled extensions (stochastic returns, longevity risk, glide-path allocation, lumpy goals).
 
 ---
 
