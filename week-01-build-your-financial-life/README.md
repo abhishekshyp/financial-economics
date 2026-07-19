@@ -152,14 +152,28 @@ This is a **deterministic accounting model** built around the LCH/PIH identity. 
 - **A single constant return** ignores the age-based glide path (high equity when young, de-risking with age) implied by human-capital theory.
 - **Retirement spending is held flat in real terms**, whereas the empirical profile falls at retirement and rises late in life as healthcare dominates — a basket that also inflates faster than headline CPI.
 - **Consumption is smooth and exogenous.** Real lives are lumpy (education, marriage, housing, vehicles, emergencies) and often debt-financed; the model has one asset, no housing, and no explicit liabilities.
-- **One discount rate** does the work of three distinct objects (risk-free time value, risky expected return, time preference), and human capital is discounted at the same rate as financial assets.
-- **Single agent, exponential discounting** — no household structure, no behavioral frictions (present bias, mental accounting, habit formation).
-
-The three highest-leverage extensions are **stochastic returns + longevity** (turns a point estimate into a ruin probability), an **age-based glide path**, and **endogenous consumption** via an Euler equation (moving from a positive identity to a normative "how much should you save").
 
 ---
 
-## References
+## Readings & references
+
+### Suggested textbook chapters
+
+**Bodie, Kane & Marcus — *Investments*** (chapter numbers follow the 12th–13th editions):
+| Chapter | What it supports in this module |
+|---|---|
+| **Ch. 5 — Risk, Return, and the Historical Record** | Real vs. nominal returns, inflation, and the Fisher relation; the historical risk–return record that motivates the return and discount-rate assumptions. |
+| **Ch. 6 — Capital Allocation to Risky Assets** | The risky/risk-free split behind the 60:40 portfolio and the 9% blended discount rate. |
+| **Ch. 14 — Bond Prices and Yields** | Present value, discounting, and yield to maturity — the time-value machinery the model runs on. |
+| **Ch. 28 — Investment Policy and the Framework of the CFA Institute** | The investor life cycle, human capital, risk tolerance and horizon, and asset allocation across the life cycle (the glide-path idea in *Limitations*). |
+
+**Mishkin — *The Economics of Money, Banking & Financial Markets*** (numbering is stable across the 11th–13th editions):
+| Chapter | What it supports in this module |
+|---|---|
+| **Ch. 4 — The Meaning of Interest Rates** | Present (discounted) value, yield to maturity, and the real vs. nominal interest-rate distinction with the Fisher equation — the analytical backbone of the module's discounting and inflation adjustment. |
+| **Ch. 2 — An Overview of the Financial System** *(background)* | How household saving is channelled into financial assets through markets and intermediaries. |
+
+> Chapter numbers can shift by one or two between editions; the chapter **titles** are stable, so match by title if your edition differs.
 
 - Modigliani, F., & Brumberg, R. (1954). *Utility Analysis and the Consumption Function: An Interpretation of Cross-Section Data.*
 - Friedman, M. (1957). *A Theory of the Consumption Function.* Princeton University Press.
