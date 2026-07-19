@@ -1,6 +1,6 @@
 # Week 1 — Build Your Financial Life
 
-> An interactive life-cycle finance model that turns eight personal inputs into a full lifetime of income, consumption, saving, and wealth — and uses it to teach the Life-Cycle Hypothesis, the Permanent Income Hypothesis, human vs. financial capital, and the time value of money.
+> An interactive life-cycle finance model that turns personal inputs into a full lifetime of income, consumption, saving, and wealth — and uses it to teach the Life-Cycle Hypothesis, the Permanent Income Hypothesis, human vs. financial capital, and the time value of money.
 
 This is the opening module of the course. A student enters a handful of assumptions about their career and spending, and the model projects their entire financial life year by year — from the first salary to a bequest at life's end — exposing the core identities of personal finance and the classical consumption theories that explain them. It ships in two forms: a self-contained **web app** for exploration and demonstration, and a **transparent spreadsheet** for inspecting the mechanics formula by formula.
 
@@ -10,7 +10,7 @@ This is the opening module of the course. A student enters a handful of assumpti
 
 ```
 week1-build-your-financial-life/
-├── index.html                  # interactive single-file web app
+├── financial-life-model.html                  # interactive single-file web app
 ├── financial-life-model.xlsx   # live spreadsheet model (formulas, not hardcoded)
 └── README.md                   # this file
 ```
@@ -21,7 +21,7 @@ week1-build-your-financial-life/
 
 The two artifacts implement the **same model**. They serve different pedagogical purposes: the app builds intuition and is ideal for live demonstration; the spreadsheet makes every calculation auditable and is ideal for homework and "open the hood" sessions.
 
-### `index.html` — interactive web app
+### `financial-life-model.html` — interactive web app
 
 A single, self-contained HTML file (no build step, no server). A student adjusts the eight inputs and the model recomputes instantly, presenting:
 
@@ -175,6 +175,7 @@ This is a **deterministic accounting model** built around the LCH/PIH identity. 
 
 > Chapter numbers can shift by one or two between editions; the chapter **titles** are stable, so match by title if your edition differs.
 
+### Foundational papers
 - Modigliani, F., & Brumberg, R. (1954). *Utility Analysis and the Consumption Function: An Interpretation of Cross-Section Data.*
 - Friedman, M. (1957). *A Theory of the Consumption Function.* Princeton University Press.
 - Fisher, I. (1930). *The Theory of Interest.*
