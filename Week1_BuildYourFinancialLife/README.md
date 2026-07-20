@@ -52,7 +52,7 @@ A five-sheet workbook where **every figure is a live formula** driven by the inp
 
 This module covers the following concepts, each made concrete by a specific feature of the model:
 
-- **Income, consumption, saving, and borrowing** as flows, and the accounting identity that binds them.
+- **Income, consumption, and savings** as flows, and the accounting identity that binds them.
 - **The time value of money** — compounding a saving stream over a multi-decade horizon, and discounting future flows to a present value.
 - **Nominal vs. real values** and the **Fisher relation** — why a large future rupee figure shrinks in today's purchasing power, and why present value is invariant to the nominal/real framing.
 - **Human capital vs. financial capital** — labour income as the present value of future earnings, its depletion with age, and the **crossover** at which accumulated savings overtake remaining earning power.
