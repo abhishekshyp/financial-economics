@@ -17,6 +17,24 @@ There are **10 tutorials**, and **each one carries a graded assignment**.
 
 ---
 
+---
+
+## Course details
+
+| Week | Tutorial |
+|---|---|
+| **1** | **Build Your Financial Life** — *where does a whole lifetime of income actually go?* |
+| **2** | **What's Your Risk Appetite?** — *how much uncertainty can you stomach — and what does it cost you?* |
+| **3–4** | **Build Your Personal Portfolio** — *from a blank slate to a portfolio that's genuinely yours* |
+| **5** | **Asset Accumulation & the Rebalancing Problem** — *your winners grow and your mix drifts — when do you correct course?* |
+| **6** | **Can You Beat the Market?** — *skill or luck? put the efficient-market hypothesis to the test* |
+| **7** | **Measuring Portfolio Performance** — *returns are easy; risk-adjusted returns tell the real story* |
+| **8** | **Other Ways to Hedge Risk** — *diversification, options, insurance — tools beyond just holding cash* |
+| **9** | **Active Investing: Direct Equity, DIY** — *think you can pick stocks? let's check your smartness* |
+| **10** | **Lazy Investing** — *do less, win more? the case for going passive* |
+
+---
+
 ## Assignments & grading
 
 | Component | Marks |
