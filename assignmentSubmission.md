@@ -64,9 +64,9 @@ Depending on the assignment, submissions may include one or more of the followin
 
 ### Important
 
-- ✅ Submit **before the deadline**.
-- ✅ Verify that your file or folder has been uploaded successfully.
-- ✅ Ensure that your submission is placed in the correct weekly folder.
-- ✅ Follow the required naming convention exactly.
+- Submit **before the deadline**.
+- Verify that your file or folder has been uploaded successfully.
+- Ensure that your submission is placed in the correct weekly folder.
+- Follow the required naming convention exactly.
 
 **No submissions received after the deadline or through email, WhatsApp, Microsoft Teams, or any other platform will be accepted.**
