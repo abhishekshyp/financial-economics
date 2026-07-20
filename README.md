@@ -2,7 +2,7 @@
 
 Welcome. This handbook explains how the tutorials run, how you are graded, the tools you will need, and a curated set of readings, courses, and resources to go deeper. Each week's module (slides, tools, and assignment) lives in its own folder; this page is the map.
 
-- https://abhishekshyp.github.io/financial-economics
+Ready, set, go! https://abhishekshyp.github.io/financial-economics
 
 ---
 
