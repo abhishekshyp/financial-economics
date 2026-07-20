@@ -17,8 +17,6 @@ There are **10 tutorials**, and **each one carries a graded assignment**.
 
 ---
 
----
-
 ## Course details
 
 | Week | Tutorial |
