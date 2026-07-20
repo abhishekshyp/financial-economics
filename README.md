@@ -112,4 +112,26 @@ In short: **20 marks** are within reach through consistent submission, and the r
 
 ---
 
-*Readings and resources are for learning only and are not financial advice.*
+## About this course
+
+This tutorial series is a part of the **Financial Economics: Theory and Practice** course (**HSN-605**) offered at the **Department of Humanities and Social Sciences, Indian Institute of Technology (IIT) Roorkee, India** for undergraduate and postgraduate students.
+
+The course is designed and taught by **Prof. Manish K. Singh**, and the tutorials, practical sessions, and course materials are coordinated by **Abhishek Kashyap** (Teaching Assistant).
+
+### Course Team
+
+- **Prof. Manish K. Singh**  
+  Course Instructor  
+  Department of Humanities and Social Sciences  
+  Indian Institute of Technology Roorkee  
+  Profile: https://www.iitr.ac.in/~HS/Manish_Kumar_Singh
+
+- **Abhishek Kashyap**  
+  Teaching Assistant  
+  Department of Humanities and Social Sciences  
+  Indian Institute of Technology Roorkee  
+  Email: <mailto:abhishek_k@hs.iitr.ac.in>
+
+---
+
+*This repository contains tutorial materials developed to support the HSN-605 course. It is intended solely for educational purposes and should not be interpreted as financial, investment, or legal advice.*
