@@ -718,7 +718,7 @@
   </head>
   <body>
     <header class="masthead">
-      <div class="eyebrow">Financial Economics · Life-Cycle Lab</div>
+      <div class="eyebrow">Financial Economics · Week 1</div>
       <h1>Build Your <em>Financial Life</em></h1>
       <p class="lede">
         Enter the financial plan you expect to live. The model traces your
@@ -732,7 +732,7 @@
       <!-- ============ INPUT RAIL ============ -->
       <aside class="rail">
         <h2>Your plan</h2>
-        <div class="sub">the eight student inputs</div>
+        <div class="sub"></div>
 
         <div class="fieldset">
           <div class="legend"><span>Income</span></div>
@@ -835,10 +835,6 @@
                 step="0.25"
               /><span class="unit">%</span>
             </div>
-          </div>
-          <div class="hint" style="grid-column: 1/-1; margin-top: -4px">
-            Savings rate is <b>not</b> an input — it is the residual (post-tax
-            income − consumption) and may go negative early (borrowing).
           </div>
         </div>
 
@@ -949,8 +945,8 @@
             "
           >
             <div class="toggle" role="group" aria-label="Value framing">
-              <button id="tNom" class="on">Nominal ₹</button>
-              <button id="tReal">Real ₹ (today)</button>
+              <button id="tReal" class="on">Real ₹ (today)</button>
+              <button id="tNom">Nominal ₹</button>
             </div>
             <div class="note" id="frameNote"></div>
           </div>
@@ -959,7 +955,7 @@
 
         <!-- Accumulation cards -->
         <div class="sectlabel">
-          <span class="idx">A</span> Accumulation phase — the eight outputs
+          <span class="idx">A</span> Accumulation phase
           <span
             id="accSpan"
             style="
@@ -1338,7 +1334,7 @@
 
       /* ---------- rendering ---------- */
       let charts = {};
-      let FRAME = "nom"; // nom | real
+      let FRAME = "real"; // nom | real
       const COL = {
         ink: "#182129",
         teal: "#0E7C66",
@@ -2003,9 +1999,10 @@
 
           // ---- retirement & wealth ----
           heading("4 · Retirement, corpus & diagnostics");
+          const realBequest = m.bequest / Math.pow(1 + p.infl, m.rows.length);
           const retLast =
             m.depleteAge === null
-              ? ["Bequest at " + p.lifeExp + " (nominal)", inrPdf(m.bequest)]
+              ? ["Bequest at " + p.lifeExp + " (real)", inrPdf(realBequest)]
               : [
                   "Corpus depletes at age",
                   String(m.depleteAge) +
@@ -2205,7 +2202,7 @@
         // side text
         const p = MODEL.p;
         $("discRat").innerHTML =
-          `Discount rate <b>${pct(p.disc)}</b> ≈ a 60:40 portfolio: 60% equity @ 11% + 40% debt @ 6%. Used to value future rupees today. Real rate ≈ ${pct(MODEL.realDisc)}.`;
+          `Discount rate 9% ≈ a 60:40 portfolio: 60% equity @ 11% + 40% debt @ 6%. Used to value future rupees today. Real rate ≈ 2.8%.`;
         $("ctcHint").textContent = compact(p.ctc) + " p.a.";
         $("leSpan").textContent = p.lifeExp;
         $("footAssume").textContent =
