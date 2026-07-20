@@ -1,5 +1,3 @@
----
-
 # Assignment Submission
 
 All assignments for this course must be submitted through the shared Google Drive folder:
