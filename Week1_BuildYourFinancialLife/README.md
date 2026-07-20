@@ -1,6 +1,6 @@
 # Week 1 — Build Your Financial Life
 
-> An interactive life-cycle finance model that turns personal inputs into a full lifetime of income, consumption, saving, and wealth — and uses it to teach the Life-Cycle Hypothesis, the Permanent Income Hypothesis, human vs. financial capital, and the time value of money.
+> An interactive life-cycle finance model that turns personal inputs into a full lifetime of income, consumption, saving, and wealth — and uses it to teach the Life-Cycle Hypothesis, the Permanent Income Hypothesis, human vs. financial capital, and the time value of money. 
 
 This is the opening module of the course. A student enters a handful of assumptions about their career and spending, and the model projects their entire financial life year by year — from the first salary to a bequest at life's end — exposing the core identities of personal finance and the classical consumption theories that explain them. It ships in two forms: a self-contained **web app** for exploration and demonstration, and a **transparent spreadsheet** for inspecting the mechanics formula by formula.
 
