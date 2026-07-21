@@ -1,0 +1,983 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Week 01 — Build Your Financial Life</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;450;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+      :root {
+        --paper: #f1f3ef;
+        --panel: #fbfcfa;
+        --ink: #182129;
+        --ink-soft: #4a5760;
+        --ink-faint: #8b979e;
+        --line: #d7dcd4;
+        --line-strong: #c3cabf;
+        --teal: #0e7c66;
+        --teal-deep: #0a5a4a;
+        --amber: #b9822b;
+        --rust: #b0472b;
+        --blue: #3b6c8c;
+        --slate: #6b7a82;
+        --shadow: 0 1px 2px rgba(24, 33, 41, 0.05), 0 8px 30px -14px rgba(24, 33, 41, 0.18);
+        --radius: 4px;
+        --paper-grid:
+          repeating-linear-gradient(0deg, transparent 0 27px, rgba(24, 33, 41, 0.035) 27px 28px),
+          repeating-linear-gradient(90deg, transparent 0 27px, rgba(24, 33, 41, 0.035) 27px 28px);
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: "IBM Plex Sans", system-ui, sans-serif;
+        font-weight: 400;
+        font-size: clamp(14px, 1.35vw, 17px);
+        line-height: 1.5;
+        letter-spacing: -0.005em;
+        -webkit-font-smoothing: antialiased;
+        overflow: hidden;
+        background-image: linear-gradient(var(--paper), var(--paper)), var(--paper-grid);
+      }
+      .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-feature-settings: "tnum" 1; }
+      h1, h2, h3, .disp { font-family: "Fraunces", Georgia, serif; font-weight: 500; letter-spacing: -0.01em; }
+      em { font-style: italic; color: var(--teal-deep); font-weight: inherit; }
+
+      /* ---------- deck shell ---------- */
+      .deck { position: fixed; inset: 0; }
+      .slide {
+        position: absolute; inset: 0;
+        opacity: 0; visibility: hidden;
+        transform: translateY(16px);
+        transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s;
+        overflow-y: auto;
+      }
+      .slide.active { opacity: 1; visibility: visible; transform: none; }
+      .inner {
+        max-width: 1160px; margin: 0 auto;
+        min-height: 100%;
+        padding: clamp(28px, 6vh, 74px) clamp(22px, 5.5vw, 80px) clamp(74px, 12vh, 104px);
+        display: flex; flex-direction: column; justify-content: center; gap: 0;
+      }
+      .inner.top { justify-content: flex-start; }
+
+      /* ---------- structural type ---------- */
+      .eyebrow {
+        font-family: "IBM Plex Mono"; font-size: clamp(10.5px, 1vw, 12.5px);
+        letter-spacing: 0.22em; text-transform: uppercase; color: var(--teal-deep);
+        font-weight: 500; display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+      }
+      .eyebrow .idx { color: var(--ink-faint); }
+      .eyebrow::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+      h1.title { font-size: clamp(34px, 6vw, 76px); line-height: 1.02; font-weight: 600; margin: 0.12em 0 0.28em; }
+      h2.head { font-size: clamp(26px, 4.4vw, 52px); line-height: 1.05; font-weight: 600; margin: 0 0 0.35em; max-width: 20ch; }
+      h2.head.wide { max-width: 26ch; }
+      .lede { color: var(--ink-soft); font-size: clamp(15px, 1.7vw, 21px); line-height: 1.5; max-width: 62ch; margin: 0 0 1.1em; }
+      .lede b { color: var(--ink); font-weight: 600; }
+      p.body { color: var(--ink-soft); font-size: clamp(14px, 1.45vw, 18px); line-height: 1.62; max-width: 66ch; margin: 0 0 0.9em; }
+      p.body b { color: var(--ink); font-weight: 600; }
+      .quote {
+        font-family: "Fraunces"; font-weight: 500; font-style: italic;
+        font-size: clamp(20px, 2.9vw, 34px); line-height: 1.28; color: var(--ink);
+        max-width: 24ch; margin: 0.1em 0 0.5em; padding-left: 20px;
+        border-left: 3px solid var(--teal);
+      }
+      .attn { color: var(--teal-deep); }
+
+      .callout {
+        font-family: "IBM Plex Mono"; font-size: clamp(11.5px, 1.15vw, 13.5px);
+        color: var(--teal-deep); background: rgba(14, 124, 102, 0.07);
+        border: 1px solid rgba(14, 124, 102, 0.25); border-radius: var(--radius);
+        padding: 10px 13px; margin-top: 14px; display: inline-block; line-height: 1.5;
+      }
+      .callout.warn { color: var(--rust); background: rgba(176, 71, 43, 0.07); border-color: rgba(176, 71, 43, 0.28); }
+      .callout.ink  { color: var(--ink-soft); background: rgba(24, 33, 41, 0.05); border-color: var(--line-strong); }
+      .note { font-family: "IBM Plex Mono"; font-size: clamp(11px, 1vw, 12.5px); color: var(--ink-faint); margin-top: 8px; }
+
+      .panel {
+        background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+        box-shadow: var(--shadow); padding: clamp(16px, 2vw, 24px);
+      }
+      .panel.grid { background-image: linear-gradient(var(--panel), var(--panel)),
+        repeating-linear-gradient(0deg, transparent 0 23px, rgba(24,33,41,0.028) 23px 24px),
+        repeating-linear-gradient(90deg, transparent 0 23px, rgba(24,33,41,0.028) 23px 24px);
+        background-clip: padding-box; }
+
+      .two { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(18px, 3vw, 44px); align-items: center; }
+      .two.rail { grid-template-columns: 0.92fr 1.08fr; }
+      @media (max-width: 860px) { .two { grid-template-columns: 1fr; } }
+
+      /* ---------- chart wrap ---------- */
+      .chartwrap { position: relative; width: 100%; height: clamp(260px, 42vh, 440px); }
+      .chartwrap canvas { max-width: 100% !important; }
+      .chart-h { font-size: clamp(15px, 1.6vw, 19px); font-weight: 600; margin: 0 0 2px; }
+      .chart-cap { font-size: clamp(12px, 1.15vw, 14px); color: var(--ink-soft); margin: 0 0 12px; line-height: 1.45; }
+
+      /* ---------- title slide ---------- */
+      .title-meta { margin-top: clamp(20px, 4vh, 48px); display: flex; flex-direction: column; gap: 4px; }
+      .title-meta .who { font-family: "Fraunces"; font-size: clamp(18px, 2vw, 24px); font-weight: 600; }
+      .title-meta .mail { font-family: "IBM Plex Mono"; font-size: clamp(12px, 1.2vw, 14px); color: var(--teal-deep); }
+      .title-sub { font-family: "IBM Plex Mono"; font-size: clamp(12px, 1.3vw, 15px); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); }
+      .kbd-hint { margin-top: clamp(26px, 5vh, 58px); font-family: "IBM Plex Mono"; font-size: 12px; color: var(--ink-faint); }
+      .kbd { border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: 4px; padding: 1px 7px; background: #fff; color: var(--ink-soft); margin: 0 1px; }
+
+      /* ---------- activity worksheet ---------- */
+      .sheet { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      @media (max-width: 640px) { .sheet { grid-template-columns: 1fr; } }
+      .sheet .cell { border: 1px solid var(--line); border-left: 3px solid var(--teal); border-radius: var(--radius); background: var(--panel); padding: 14px 16px; box-shadow: var(--shadow); }
+      .sheet .cell.c-amber { border-left-color: var(--amber); }
+      .sheet .cell.c-rust { border-left-color: var(--rust); }
+      .sheet .cell.c-blue { border-left-color: var(--blue); }
+      .sheet .cell .q { font-size: clamp(13px, 1.35vw, 16px); color: var(--ink); font-weight: 500; }
+      .sheet .cell .u { font-family: "IBM Plex Mono"; font-size: 11px; color: var(--ink-faint); margin-top: 6px; border-top: 1px dashed var(--line-strong); padding-top: 8px; }
+
+      /* ---------- big CTA / link ---------- */
+      .cta {
+        display: inline-flex; align-items: center; gap: 10px; text-decoration: none;
+        font-family: "IBM Plex Mono"; font-size: clamp(13px, 1.3vw, 15.5px); font-weight: 500;
+        color: var(--paper); background: var(--teal); border: 1px solid var(--teal);
+        padding: 13px 20px; border-radius: var(--radius); box-shadow: var(--shadow);
+        transition: background 0.15s, transform 0.08s;
+      }
+      .cta:hover { background: var(--teal-deep); border-color: var(--teal-deep); }
+      .cta:active { transform: translateY(1px); }
+      .urlline { font-family: "IBM Plex Mono"; font-size: clamp(12px, 1.25vw, 15px); color: var(--teal-deep); word-break: break-all; margin-top: 14px; }
+
+      /* ---------- identity bar ---------- */
+      .idbar { display: flex; width: 100%; height: 64px; border: 1px solid var(--line-strong); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); font-family: "IBM Plex Mono"; }
+      .idbar .seg { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-size: 12px; padding: 4px; }
+      .idbar .seg .pct { font-size: 15px; font-weight: 600; }
+      .seg.tax { background: var(--rust); } .seg.con { background: var(--amber); } .seg.sav { background: var(--teal); }
+      .idlegend { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 14px; font-family: "IBM Plex Mono"; font-size: 12.5px; color: var(--ink-soft); }
+      .idlegend .k { display: inline-flex; align-items: center; gap: 7px; }
+      .idlegend .sw { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+
+      /* ---------- vote widget ---------- */
+      .vote { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(14px, 2.4vw, 30px); }
+      @media (max-width: 720px) { .vote { grid-template-columns: 1fr; } }
+      .voptcard { border: 1px solid var(--line); border-top: 3px solid var(--teal); border-radius: var(--radius); background: var(--panel); box-shadow: var(--shadow); padding: 20px; text-align: center; }
+      .voptcard.b { border-top-color: var(--amber); }
+      .voptcard .lbl { font-family: "Fraunces"; font-size: clamp(18px, 2.3vw, 26px); font-weight: 600; }
+      .voptcard .sub { font-size: 13px; color: var(--ink-soft); margin: 4px 0 16px; min-height: 2.4em; }
+      .counter { display: flex; align-items: center; justify-content: center; gap: 14px; }
+      .counter button { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--line-strong); background: #fff; font-size: 22px; line-height: 1; cursor: pointer; color: var(--ink); font-family: "IBM Plex Mono"; transition: background 0.12s, border-color 0.12s; }
+      .counter button:hover { background: rgba(14,124,102,0.08); border-color: var(--teal); }
+      .counter input { width: 92px; text-align: center; font-family: "IBM Plex Mono"; font-weight: 600; font-size: 30px; border: none; border-bottom: 2px solid var(--line-strong); background: transparent; color: var(--ink); padding: 4px 0; }
+      .counter input:focus { outline: none; border-color: var(--teal); }
+      .votebar { margin-top: 26px; }
+      .vbrow { display: grid; grid-template-columns: 160px 1fr 64px; align-items: center; gap: 12px; margin-bottom: 10px; font-family: "IBM Plex Mono"; font-size: 13px; }
+      @media (max-width: 640px) { .vbrow { grid-template-columns: 96px 1fr 52px; } }
+      .vbrow .track { height: 22px; background: rgba(24,33,41,0.05); border-radius: 4px; overflow: hidden; }
+      .vbrow .fill { display: block; height: 100%; width: 0; border-radius: 4px; transition: width 0.45s ease; }
+      .vbrow .fill.a { background: var(--teal); } .vbrow .fill.b { background: var(--amber); }
+      .vbrow .val { text-align: right; color: var(--ink); font-weight: 600; }
+
+      /* ---------- sliders ---------- */
+      .controls { display: flex; flex-direction: column; gap: 16px; }
+      .ctl { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: center; }
+      .ctl label { font-size: 13.5px; color: var(--ink); }
+      .ctl .out { font-family: "IBM Plex Mono"; font-weight: 600; font-size: 15px; color: var(--teal-deep); text-align: right; }
+      input[type="range"] { grid-column: 1 / -1; -webkit-appearance: none; appearance: none; width: 100%; height: 4px; background: var(--line-strong); border-radius: 999px; outline: none; margin: 4px 0 0; }
+      input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--teal); border: 2px solid #fff; box-shadow: var(--shadow); cursor: pointer; }
+      input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--teal); border: 2px solid #fff; box-shadow: var(--shadow); cursor: pointer; }
+      .formula { font-family: "IBM Plex Mono"; font-size: clamp(16px, 2vw, 24px); color: var(--ink); background: rgba(14,124,102,0.06); border: 1px solid rgba(14,124,102,0.22); border-radius: var(--radius); padding: 14px 16px; text-align: center; line-height: 1.5; }
+      .formula .sub { color: var(--teal-deep); }
+      .formula .res { color: var(--teal-deep); font-weight: 600; }
+      .formula sup { font-size: 0.62em; }
+      .bignum { font-family: "IBM Plex Mono"; font-weight: 600; font-size: clamp(26px, 4.4vw, 46px); color: var(--teal-deep); line-height: 1; letter-spacing: -0.02em; }
+      .bignum.rust { color: var(--rust); }
+
+      /* ---------- persona game ---------- */
+      .persona { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(14px, 2.4vw, 30px); }
+      @media (max-width: 720px) { .persona { grid-template-columns: 1fr; } }
+      .pcard { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); box-shadow: var(--shadow); padding: 22px; text-align: center; }
+      .pcard .name { font-family: "Fraunces"; font-size: clamp(20px, 2.6vw, 30px); font-weight: 600; }
+      .pcard .row { display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid var(--line); padding: 12px 2px; font-family: "IBM Plex Mono"; font-size: 14px; }
+      .pcard .row .lab { color: var(--ink-soft); }
+      .pcard .row .fig { font-weight: 600; font-size: 17px; }
+      .hidden-age { color: var(--ink-faint); letter-spacing: 0.1em; }
+      .reveal-age { color: var(--blue); }
+      .reveal-hc { color: var(--teal-deep); }
+      .verdict { text-align: center; margin-top: 22px; font-family: "Fraunces"; font-style: italic; font-size: clamp(18px, 2.4vw, 28px); color: var(--ink); min-height: 1.4em; }
+      button.act {
+        font-family: "IBM Plex Mono"; font-size: 13.5px; font-weight: 500; cursor: pointer;
+        color: var(--paper); background: var(--ink); border: 1px solid var(--ink);
+        padding: 11px 18px; border-radius: var(--radius); transition: background 0.15s, transform 0.08s;
+      }
+      button.act:hover { background: #000; } button.act:active { transform: translateY(1px); }
+      button.act.teal { background: var(--teal); border-color: var(--teal); }
+      button.act.teal:hover { background: var(--teal-deep); }
+      .center { text-align: center; }
+
+      /* ---------- two time machines ---------- */
+      .machines { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(16px, 3vw, 40px); }
+      @media (max-width: 720px) { .machines { grid-template-columns: 1fr; } }
+      .machine { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); box-shadow: var(--shadow); padding: 26px; }
+      .machine .arrow { font-family: "IBM Plex Mono"; font-size: clamp(26px, 4vw, 44px); letter-spacing: 0.1em; }
+      .machine.fwd { border-top: 3px solid var(--teal); } .machine.fwd .arrow { color: var(--teal); }
+      .machine.bwd { border-top: 3px solid var(--blue); } .machine.bwd .arrow { color: var(--blue); }
+      .machine h3 { font-size: clamp(19px, 2.3vw, 26px); margin: 12px 0 6px; }
+      .machine p { color: var(--ink-soft); font-size: 14.5px; margin: 0; line-height: 1.55; }
+
+      /* ---------- limitations ---------- */
+      .lims { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+      @media (max-width: 860px) { .lims { grid-template-columns: 1fr; } }
+      .lim { border: 1px solid var(--line); border-top: 3px solid var(--rust); border-radius: var(--radius); background: var(--panel); box-shadow: var(--shadow); padding: 18px 20px; }
+      .lim .n { font-family: "IBM Plex Mono"; font-size: 12px; color: var(--rust); letter-spacing: 0.14em; }
+      .lim h4 { font-family: "Fraunces"; font-size: clamp(16px, 1.8vw, 20px); margin: 6px 0 8px; font-weight: 600; }
+      .lim p { margin: 0; font-size: 13.5px; color: var(--ink-soft); line-height: 1.55; }
+
+      /* ---------- refs (thank you) ---------- */
+      .refs { font-family: "IBM Plex Mono"; font-size: clamp(11px, 1.05vw, 12.5px); color: var(--ink-faint); line-height: 1.7; margin-top: 22px; max-width: 70ch; }
+
+      /* ---------- chrome: progress + nav + overview ---------- */
+      #progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--teal); width: 0; z-index: 40; transition: width 0.4s ease; }
+      #nav { position: fixed; bottom: 0; left: 0; right: 0; height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 clamp(14px, 3vw, 40px); z-index: 40; pointer-events: none; }
+      #nav .slug { font-family: "IBM Plex Mono"; font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); pointer-events: auto; }
+      #nav .ctrls { display: flex; align-items: center; gap: 8px; pointer-events: auto; }
+      #nav .ctrls .count { font-family: "IBM Plex Mono"; font-size: 13px; color: var(--ink-soft); min-width: 66px; text-align: center; }
+      #nav button { width: 34px; height: 34px; border-radius: var(--radius); border: 1px solid var(--line-strong); background: var(--panel); color: var(--ink-soft); cursor: pointer; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; transition: background 0.12s, color 0.12s, border-color 0.12s; }
+      #nav button:hover { background: #fff; color: var(--ink); border-color: var(--ink); }
+      #overview { position: fixed; inset: 0; background: rgba(241,243,239,0.97); z-index: 60; display: none; padding: clamp(24px, 5vh, 60px) clamp(20px, 5vw, 70px); overflow-y: auto; }
+      #overview.on { display: block; }
+      #overview h3 { font-size: clamp(18px, 2.4vw, 26px); margin: 0 0 18px; }
+      .ovgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+      .ovcell { text-align: left; border: 1px solid var(--line); border-left: 3px solid var(--line-strong); border-radius: var(--radius); background: var(--panel); padding: 12px 14px; cursor: pointer; transition: border-color 0.12s, box-shadow 0.12s; }
+      .ovcell:hover { border-left-color: var(--teal); box-shadow: var(--shadow); }
+      .ovcell.here { border-left-color: var(--teal); }
+      .ovcell .on { font-family: "IBM Plex Mono"; font-size: 11px; color: var(--teal-deep); letter-spacing: 0.12em; }
+      .ovcell .ot { font-size: 14px; color: var(--ink); margin-top: 4px; line-height: 1.3; }
+
+      @media (prefers-reduced-motion: reduce) {
+        .slide { transition: opacity 0.2s; transform: none !important; }
+        .vbrow .fill, #progress { transition: none; }
+      }
+
+      /* ---------- print / PDF ---------- */
+      @media print {
+        body { overflow: visible; background: #fff; }
+        #progress, #nav, #overview { display: none !important; }
+        .slide { position: relative; opacity: 1 !important; visibility: visible !important; transform: none !important; page-break-after: always; min-height: 100vh; }
+        .inner { justify-content: flex-start; padding-top: 40px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="progress"></div>
+    <div class="deck" id="deck">
+
+      <!-- 01 · TITLE -->
+      <section class="slide" data-slug="Title">
+        <div class="inner">
+          <div class="eyebrow"><span>Financial Economics Tutorial</span><span class="idx">01</span></div>
+          <div class="title-sub">Week 01</div>
+          <h1 class="title">Build Your<br /><em>Financial Life</em></h1>
+          <div class="title-meta">
+            <span class="who">Abhishek Kashyap</span>
+            <span class="mail">abhishek_k@hs.iitr.ac.in</span>
+          </div>
+          <div class="kbd-hint">Navigate with <span class="kbd">←</span> <span class="kbd">→</span> · overview <span class="kbd">O</span> · fullscreen <span class="kbd">F</span></div>
+        </div>
+      </section>
+
+      <!-- 02 · ACTIVITY -->
+      <section class="slide" data-slug="Activity">
+        <div class="inner top">
+          <div class="eyebrow"><span>Activity · Pen &amp; Paper</span><span class="idx">02</span></div>
+          <h2 class="head wide">Sketch your whole financial life — on paper, before any model touches it.</h2>
+          <p class="body">Across your <b>entire lifetime</b>, estimate each of the four destinations of every rupee you will earn — and what remains at the end for the next generation.</p>
+          <div class="sheet" style="margin-top:6px">
+            <div class="cell"><div class="q">① Total money you will <b>earn</b> in your life</div><div class="u">gross, across the whole career</div></div>
+            <div class="cell c-amber"><div class="q">② How much you will <b>spend</b> (consume)</div><div class="u">food · housing · travel · everything lived</div></div>
+            <div class="cell c-blue"><div class="q">③ How much you will <b>save</b></div><div class="u">deferred consumption → invested</div></div>
+            <div class="cell c-rust"><div class="q">④ How much you will pay in <b>taxes</b></div><div class="u">claimed before you decide</div></div>
+          </div>
+          <p class="body" style="margin-top:16px">And — how much will you <b>leave behind</b> for the next generation?</p>
+          <span class="callout ink">Hint · start from your <b>first salary</b>, your <b>starting age</b>, and a retirement age of <b>60</b>.</span>
+          <div class="note">Note — keep every number in INR (₹).</div>
+        </div>
+      </section>
+
+      <!-- 03 · CALCULATE -->
+      <section class="slide" data-slug="Compute your worth">
+        <div class="inner">
+          <div class="eyebrow"><span>Let's put numbers on it</span><span class="idx">03</span></div>
+          <h2 class="head">Now calculate your financial worth.</h2>
+          <p class="lede">Open the interactive life-cycle model, enter your plan, and watch your entire financial life project forward — year by year.</p>
+          <div>
+            <a class="cta" href="https://abhishekshyp.github.io/financial-economics/Week1_BuildYourFinancialLife/" target="_blank" rel="noopener">Open the model  ↗</a>
+          </div>
+          <div class="urlline">abhishekshyp.github.io/financial-economics/Week1_BuildYourFinancialLife/</div>
+          <span class="callout">Enter your inputs, then keep them beside you — we will read this life together.</span>
+        </div>
+      </section>
+
+      <!-- 04 · IDENTITY -->
+      <section class="slide" data-slug="The identity">
+        <div class="inner">
+          <div class="eyebrow"><span>How to think about personal finance</span><span class="idx">04</span></div>
+          <h2 class="head wide">Gross income = Taxes + Consumption + Savings</h2>
+          <p class="quote">"Every rupee you earn has only three possible destinations."</p>
+          <p class="body">Before you even decide, the government takes a share as <b>taxes</b> — and returns public services for it. That portion is simply not available for personal use. What's left splits between <b>consumption</b> (spent now) and <b>savings</b> (kept for later).</p>
+          <div class="idbar" style="margin-top:8px" aria-label="₹100 of gross income split into tax, consumption, savings">
+            <div class="seg tax" style="width:15%"><span class="pct">15%</span><span>Taxes</span></div>
+            <div class="seg con" style="width:59.5%"><span class="pct">59.5%</span><span>Consumption</span></div>
+            <div class="seg sav" style="width:25.5%"><span class="pct">25.5%</span><span>Savings</span></div>
+          </div>
+          <div class="idlegend">
+            <span class="k"><span class="sw" style="background:var(--rust)"></span> claimed first</span>
+            <span class="k"><span class="sw" style="background:var(--amber)"></span> lived today</span>
+            <span class="k"><span class="sw" style="background:var(--teal)"></span> future you</span>
+          </div>
+          <div class="note">Illustrative split on ₹100 of gross income at the model's defaults (15% tax; 70% of post-tax consumed).</div>
+        </div>
+      </section>
+
+      <!-- 05 · WHY EARN -->
+      <section class="slide" data-slug="Why we earn">
+        <div class="inner">
+          <div class="eyebrow"><span>The point of it all</span><span class="idx">05</span></div>
+          <h2 class="head">Why do we earn money?</h2>
+          <p class="lede"><b>To consume.</b> Food, housing, clothes, education, entertainment, travel — the things a life is actually made of.</p>
+          <p class="body">Economics says consumption generates <em>utility</em> — happiness, or satisfaction. So money is not the goal; it is a claim on things you value. In a very real sense, <b>money has value only when it is converted into consumption.</b></p>
+          <span class="callout">A rupee never spent, and never meant to be, was never really wealth.</span>
+        </div>
+      </section>
+
+      <!-- 06 · SAVINGS = FUTURE CONSUMPTION -->
+      <section class="slide" data-slug="Savings = future consumption">
+        <div class="inner">
+          <div class="eyebrow"><span>Reframing the third bucket</span><span class="idx">06</span></div>
+          <div class="two rail">
+            <div>
+              <h2 class="head">Savings are simply <em>future</em> consumption.</h2>
+              <p class="quote">"I choose to consume later instead of today."</p>
+              <p class="body">You receive one whole pizza each month. One slice goes to the government. Several slices feed <b>today's you</b>. The rest are <b>frozen</b> — put away for a future, hungrier you.</p>
+              <span class="callout">Saving isn't the opposite of spending. It's <b>spending scheduled for later</b>.</span>
+            </div>
+            <div class="panel grid">
+              <div class="chart-h">Your monthly pizza, sliced</div>
+              <div class="chart-cap">Same defaults as the identity — 15% claimed, 59.5% eaten now, 25.5% frozen.</div>
+              <svg id="pizzaSvg" viewBox="0 0 320 300" style="width:100%;height:auto;max-height:38vh"></svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 07 · THIRD BUCKET -->
+      <section class="slide" data-slug="Make savings work">
+        <div class="inner">
+          <div class="eyebrow"><span>Where this course goes</span><span class="idx">07</span></div>
+          <h2 class="head wide">The rest of this course is about making that third bucket — your <em>savings</em> — work as efficiently as possible, through <em>investing</em>.</h2>
+          <p class="body">Frozen slices don't have to sit idle. Invested well, deferred consumption grows — so tomorrow's you can eat far more than you gave up today. That growth is the subject of everything ahead.</p>
+        </div>
+      </section>
+
+      <!-- 08 · MAGIC PENNY VOTE -->
+      <section class="slide" data-slug="Magic Penny · vote">
+        <div class="inner top">
+          <div class="eyebrow"><span>Time Value of Money · a vote</span><span class="idx">08</span></div>
+          <h2 class="head wide">Would you rather have <em>$1 million today</em>, or a single penny that doubles every day for 30 days?</h2>
+          <p class="body">Cast the room's vote. Tap <span class="mono">+</span> / <span class="mono">−</span>, or type the tally directly.</p>
+          <div class="vote">
+            <div class="voptcard">
+              <div class="lbl">$1,000,000</div>
+              <div class="sub">Take it today. Certain, and enormous.</div>
+              <div class="counter"><button data-vote="a" data-d="-1">−</button><input id="voteA" type="number" min="0" value="0" /><button data-vote="a" data-d="1">+</button></div>
+            </div>
+            <div class="voptcard b">
+              <div class="lbl">Penny × 2, for 30 days</div>
+              <div class="sub">Start at 1¢. Double it, every day, thirty times.</div>
+              <div class="counter"><button data-vote="b" data-d="-1">−</button><input id="voteB" type="number" min="0" value="0" /><button data-vote="b" data-d="1">+</button></div>
+            </div>
+          </div>
+          <div class="votebar">
+            <div class="vbrow"><span>$1M today</span><span class="track"><span class="fill a" id="fillA"></span></span><span class="val" id="pctA">0%</span></div>
+            <div class="vbrow"><span>Penny doubling</span><span class="track"><span class="fill b" id="fillB"></span></span><span class="val" id="pctB">0%</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 09 · PENNY REVEAL -->
+      <section class="slide" data-slug="Magic Penny · reveal">
+        <div class="inner">
+          <div class="eyebrow"><span>The answer</span><span class="idx">09</span></div>
+          <div class="two rail">
+            <div>
+              <h2 class="head">After 30 days, the penny is worth <em>over $5.3 million</em>.</h2>
+              <p class="body">For 27 days it looks like nothing — a few thousand dollars against a certain million. Then exponential growth arrives all at once: it only overtakes $1M on <b>day 28</b>, and finishes at <span class="mono attn">$5,368,709</span>.</p>
+              <span class="callout">The lesson isn't the penny. It's that <b>compounding hides its power until the very end</b>.</span>
+            </div>
+            <div class="panel grid">
+              <div class="chart-h">1¢ doubled daily vs. $1,000,000 flat</div>
+              <div class="chart-cap">Log-scaled so the early "flat" days are visible. Crossover on day 28.</div>
+              <div class="chartwrap"><canvas id="pennyChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10 · FUTURE VALUE (live) -->
+      <section class="slide" data-slug="Future Value">
+        <div class="inner">
+          <div class="eyebrow"><span>Compounding, made live</span><span class="idx">10</span></div>
+          <h2 class="head wide">Money earns returns. Those returns earn returns. And those earn even more.</h2>
+          <div class="two rail" style="margin-top:6px">
+            <div>
+              <div class="formula" id="fvFormula">FV = PV(1 + r)<sup>n</sup></div>
+              <div class="controls" style="margin-top:18px">
+                <div class="ctl"><label>Present value (PV)</label><span class="out" id="fvPVout">₹1,00,000</span><input id="fvPV" type="range" min="10000" max="2000000" step="10000" value="100000" /></div>
+                <div class="ctl"><label>Annual return (r)</label><span class="out" id="fvRout">9%</span><input id="fvR" type="range" min="0" max="20" step="0.5" value="9" /></div>
+                <div class="ctl"><label>Years (n)</label><span class="out" id="fvNout">30</span><input id="fvN" type="range" min="1" max="50" step="1" value="30" /></div>
+              </div>
+              <div class="mono" style="margin-top:18px;font-size:13px;color:var(--ink-soft)">Grows to</div>
+              <div class="bignum" id="fvResult">—</div>
+            </div>
+            <div class="panel grid">
+              <div class="chart-h">Balance over time</div>
+              <div class="chart-cap">Shaded gap between the curve and flat principal is pure <b>interest-on-interest</b>.</div>
+              <div class="chartwrap"><canvas id="fvChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 11 · PRESENT VALUE (intro) -->
+      <section class="slide" data-slug="Present Value">
+        <div class="inner">
+          <div class="eyebrow"><span>Run the machine in reverse</span><span class="idx">11</span></div>
+          <h2 class="head">Present Value — now reverse the story of time.</h2>
+          <p class="lede">"Suppose I promise to give you <b>₹1 crore</b>."</p>
+          <p class="body">Would you still accept it if I only pay you <em>after 100 years</em>? Almost no one would. Why? Because <b>money loses value with time</b> — future money simply isn't worth today's money.</p>
+          <span class="callout warn">A promise far enough away is barely a gift at all.</span>
+        </div>
+      </section>
+
+      <!-- 12 · PRESENT VALUE (live) -->
+      <section class="slide" data-slug="Present Value · live">
+        <div class="inner">
+          <div class="eyebrow"><span>Discounting, made live</span><span class="idx">12</span></div>
+          <h2 class="head wide">How much is future money worth today?</h2>
+          <div class="two rail" style="margin-top:6px">
+            <div>
+              <div class="formula" id="pvFormula">PV = FV / (1 + r)<sup>n</sup></div>
+              <div class="controls" style="margin-top:18px">
+                <div class="ctl"><label>Future value (FV)</label><span class="out" id="pvFVout">₹1.00 Cr</span><input id="pvFV" type="range" min="100000" max="50000000" step="100000" value="10000000" /></div>
+                <div class="ctl"><label>Discount rate (r)</label><span class="out" id="pvRout">9%</span><input id="pvR" type="range" min="0" max="20" step="0.5" value="9" /></div>
+                <div class="ctl"><label>Years away (n)</label><span class="out" id="pvNout">100</span><input id="pvN" type="range" min="1" max="100" step="1" value="100" /></div>
+              </div>
+              <div class="mono" style="margin-top:18px;font-size:13px;color:var(--ink-soft)">Worth today</div>
+              <div class="bignum" id="pvResult">—</div>
+            </div>
+            <div class="panel grid">
+              <div class="chart-h">Today's value of the promise, by delay</div>
+              <div class="chart-cap">Value of the chosen FV if received in year <i>t</i> — it decays toward zero.</div>
+              <div class="chartwrap"><canvas id="pvChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 13 · TWO TIME MACHINES -->
+      <section class="slide" data-slug="Two time machines">
+        <div class="inner">
+          <div class="eyebrow"><span>One idea, two directions</span><span class="idx">13</span></div>
+          <h2 class="head">Finance has two time machines.</h2>
+          <div class="machines" style="margin-top:10px">
+            <div class="machine fwd">
+              <div class="arrow">→→→</div>
+              <h3>Compounding</h3>
+              <p>Moves money <b>forward</b> in time. A rupee today becomes many rupees later — the future-value engine.</p>
+            </div>
+            <div class="machine bwd">
+              <div class="arrow">←←←</div>
+              <h3>Discounting</h3>
+              <p>Brings money <b>backward</b> in time. A rupee promised later is worth less today — the present-value engine.</p>
+            </div>
+          </div>
+          <span class="callout" style="margin-top:20px">Same physics, opposite gears: <span class="mono">(1+r)<sup>n</sup></span> forward, <span class="mono">1/(1+r)<sup>n</sup></span> backward.</span>
+        </div>
+      </section>
+
+      <!-- 14 · HC vs FC GAME -->
+      <section class="slide" data-slug="Who is richer?">
+        <div class="inner">
+          <div class="eyebrow"><span>Human vs. Financial Capital · a game</span><span class="idx">14</span></div>
+          <h2 class="head wide">Two people. Half the information hidden. Who is richer?</h2>
+          <div class="persona">
+            <div class="pcard">
+              <div class="name">Person A</div>
+              <div class="row"><span class="lab">Bank balance</span><span class="fig rust">₹0 L</span></div>
+              <div class="row"><span class="lab">Age</span><span class="fig hidden-age" id="ageA">— hidden —</span></div>
+              <div class="row"><span class="lab">Human capital</span><span class="fig reveal-hc" id="hcA">?</span></div>
+            </div>
+            <div class="pcard">
+              <div class="name">Person B</div>
+              <div class="row"><span class="lab">Bank balance</span><span class="fig">₹10 L</span></div>
+              <div class="row"><span class="lab">Age</span><span class="fig hidden-age" id="ageB">— hidden —</span></div>
+              <div class="row"><span class="lab">Human capital</span><span class="fig reveal-hc" id="hcB">?</span></div>
+            </div>
+          </div>
+          <div class="verdict" id="verdict"></div>
+          <div class="center" style="margin-top:16px"><button class="act teal" id="revealBtn">Reveal the ages ↓</button></div>
+        </div>
+      </section>
+
+      <!-- 15 · PERSON A WORTH MORE -->
+      <section class="slide" data-slug="Human capital">
+        <div class="inner">
+          <div class="eyebrow"><span>The hidden asset</span><span class="idx">15</span></div>
+          <h2 class="head wide">Person A may be worth <em>far</em> more — they own 40 years of future salary that simply hasn't arrived yet.</h2>
+          <p class="body">Your degree, skills, experience, health and network aren't just personal qualities. They generate <b>future cash flows</b> — a stream of paychecks stretching decades ahead. Discount that stream to today and you get a number, often a very large one.</p>
+          <p class="quote">This present value of your future earnings is your <span class="attn">Human Capital</span>.</p>
+        </div>
+      </section>
+
+      <!-- 16 · AUCTION YOURSELF -->
+      <section class="slide" data-slug="Auction yourself">
+        <div class="inner">
+          <div class="eyebrow"><span>Put a price on the stream</span><span class="idx">16</span></div>
+          <div class="two rail">
+            <div>
+              <h2 class="head">Auction yourself.</h2>
+              <p class="body">Google wants to hire you — but instead of paying a salary every month, they offer <b>one lump sum, today</b>, for all your future work. How much should that cheque be?</p>
+              <span class="callout">It's exactly the <b>present value</b> of your future paychecks — your human capital, priced.</span>
+            </div>
+            <div class="panel">
+              <div class="controls">
+                <div class="ctl"><label>Monthly salary</label><span class="out" id="auMout">₹1,00,000</span><input id="auM" type="range" min="20000" max="500000" step="10000" value="100000" /></div>
+                <div class="ctl"><label>Years of work left</label><span class="out" id="auYout">38</span><input id="auY" type="range" min="1" max="45" step="1" value="38" /></div>
+                <div class="ctl"><label>Discount rate</label><span class="out" id="auRout">9%</span><input id="auR" type="range" min="1" max="15" step="0.5" value="9" /></div>
+              </div>
+              <div style="margin-top:20px;text-align:center">
+                <div class="mono" style="font-size:13px;color:var(--ink-soft)">Fair lump sum today</div>
+                <div class="bignum" id="auResult" style="margin-top:6px">—</div>
+                <div class="note" id="auNote"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 17 · HC vs FC OVER LIFE -->
+      <section class="slide" data-slug="The crossover">
+        <div class="inner">
+          <div class="eyebrow"><span>Converting one into the other</span><span class="idx">17</span></div>
+          <div class="two rail">
+            <div>
+              <h2 class="head">When young, most of your wealth is <em>invisible</em>.</h2>
+              <p class="body">It lives as the ability to earn. As you age, you convert <b>human capital</b> into <b>financial capital</b> — paycheck by paycheck, saving by saving. The point where they cross is the central event of a saver's life.</p>
+              <p class="quote">"Early on, your biggest asset is your future paycheck. Later, it should be your portfolio. The journey is converting one into the other."</p>
+            </div>
+            <div class="panel grid">
+              <div class="chart-h">How wealth shifts: human → financial</div>
+              <div class="chart-cap">Share of your total wealth. Human capital gives way to financial capital, crossing <b>50% around age 49</b>.</div>
+              <div class="chartwrap"><canvas id="hcfcChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 18 · LIFE-CYCLE HYPOTHESIS -->
+      <section class="slide" data-slug="Life-Cycle Hypothesis">
+        <div class="inner">
+          <div class="eyebrow"><span>Theory · Modigliani–Brumberg (1954)</span><span class="idx">18</span></div>
+          <div class="two rail">
+            <div>
+              <h2 class="head">The Life-Cycle Hypothesis</h2>
+              <p class="body">Income arrives as a <b>hump</b> — low when young, peaking mid-career, then zero at retirement. But you want to <em>consume smoothly</em> your whole life. So you build a <b>wealth hump</b>: save on the way up, draw it down on the way out.</p>
+              <span class="callout">Save while you earn, so you can spend when you can't. Wealth is a bridge across the income gap.</span>
+            </div>
+            <div class="panel grid">
+              <div class="chart-h">Income humps; consumption stays level; wealth bridges the gap</div>
+              <div class="chart-cap">Stylized (returns set aside to show the pure hump). Income ends at 60; the green wealth hump is built, then drawn down to a small bequest.</div>
+              <div class="chartwrap"><canvas id="lchChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 19 · PERMANENT INCOME HYPOTHESIS -->
+      <section class="slide" data-slug="Permanent Income Hypothesis">
+        <div class="inner">
+          <div class="eyebrow"><span>Theory · Friedman (1957)</span><span class="idx">19</span></div>
+          <div class="two rail">
+            <div>
+              <h2 class="head">The Permanent Income Hypothesis</h2>
+              <p class="body">People spend based on their <b>lifetime resources</b>, not this month's paycheck. A one-off <em>windfall</em> barely moves consumption — you spread it across all remaining years. Try it: drop a ₹5 L bonus into year 10 and watch consumption hardly flinch.</p>
+              <div class="center" style="margin-top:8px"><button class="act teal" id="windfallBtn">Drop a ₹5 L windfall →</button></div>
+              <span class="callout" style="margin-top:14px">Transitory income is saved; only <b>permanent</b> income is consumed.</span>
+            </div>
+            <div class="panel grid">
+              <div class="chart-h">Bumpy income vs. smooth consumption</div>
+              <div class="chart-cap">Income jumps around; consumption tracks <b>permanent income</b> — a near-flat line.</div>
+              <div class="chartwrap"><canvas id="pihChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 20 · LIMITATIONS -->
+      <section class="slide" data-slug="Limitations">
+        <div class="inner">
+          <div class="eyebrow"><span>Read the model critically</span><span class="idx">20</span></div>
+          <h2 class="head wide">The model is deliberately simple. Interrogating it is the point.</h2>
+          <div class="lims" style="margin-top:8px">
+            <div class="lim"><div class="n">LIMIT 01</div><h4>No uncertainty</h4><p>Returns, income and lifespan are fixed. So there is no sequence-of-returns risk, no ruin probability, no longevity risk. The corpus is one path — not a distribution.</p></div>
+            <div class="lim"><div class="n">LIMIT 02</div><h4>One constant return</h4><p>A single fixed return ignores the age-based glide path — high equity when young, de-risking with age — that human-capital theory actually implies.</p></div>
+            <div class="lim"><div class="n">LIMIT 03</div><h4>Smooth, exogenous spending</h4><p>Real lives are lumpy — education, marriage, housing, vehicles, emergencies — and often debt-financed. The model has one asset, no housing, no explicit liabilities.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 21 · THANK YOU -->
+      <section class="slide" data-slug="Thank you">
+        <div class="inner">
+          <div class="eyebrow"><span>End of Week 01</span><span class="idx">21</span></div>
+          <h1 class="title" style="font-size:clamp(40px,7vw,88px)">Thank you.<br /><em>Questions?</em></h1>
+          <div class="title-meta">
+            <span class="who">Abhishek Kashyap</span>
+            <span class="mail">abhishek_k@hs.iitr.ac.in</span>
+          </div>
+          <div class="refs">
+            Foundational reading — Modigliani &amp; Brumberg (1954); Friedman, <i>A Theory of the Consumption Function</i> (1957); Fisher, <i>The Theory of Interest</i> (1930); Bodie, Kane &amp; Marcus, <i>Investments</i>, Ch. 5, 6, 28; Mishkin, <i>Money, Banking &amp; Financial Markets</i>, Ch. 4.
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- overview -->
+    <div id="overview">
+      <h3>Overview — jump to a slide</h3>
+      <div class="ovgrid" id="ovgrid"></div>
+    </div>
+
+    <!-- nav -->
+    <div id="nav">
+      <span class="slug" id="slug">Title</span>
+      <div class="ctrls">
+        <button id="prev" title="Previous (←)">‹</button>
+        <span class="count" id="count">01 / 21</span>
+        <button id="next" title="Next (→)">›</button>
+        <button id="ovBtn" title="Overview (O)">▦</button>
+        <button id="fsBtn" title="Fullscreen (F)">⤢</button>
+      </div>
+    </div>
+
+    <script>
+      "use strict";
+      const COL = { paper:'#f1f3ef', panel:'#fbfcfa', ink:'#182129', inkSoft:'#4a5760', inkFaint:'#8b979e', line:'#d7dcd4', lineStrong:'#c3cabf', teal:'#0e7c66', tealDeep:'#0a5a4a', amber:'#b9822b', rust:'#b0472b', blue:'#3b6c8c', slate:'#6b7a82' };
+      const $ = (id) => document.getElementById(id);
+
+      /* ---------- formatters ---------- */
+      const inrGroup = (n) => '₹' + Math.round(n).toLocaleString('en-IN');
+      function inrCompact(n){
+        const a = Math.abs(n), s = n < 0 ? '-' : '';
+        if (a >= 1e7) return s + '₹' + (a/1e7).toFixed(2) + ' Cr';
+        if (a >= 1e5) return s + '₹' + (a/1e5).toFixed(2) + ' L';
+        if (a >= 1e3) return s + '₹' + Math.round(a/1e3) + 'k';
+        return s + '₹' + Math.round(a);
+      }
+      function usd(n){
+        const a = Math.abs(n);
+        if (a >= 1e6) return '$' + (n/1e6).toFixed(2) + 'M';
+        if (a >= 1e3) return '$' + (n/1e3).toFixed(1) + 'k';
+        return '$' + n.toFixed(2);
+      }
+
+      /* ---------- chart base options ---------- */
+      function baseOpts(xTitle, yTitle, fmt, opts){
+        opts = opts || {};
+        return {
+          responsive: true, maintainAspectRatio: false,
+          animation: { duration: 600, easing: 'easeOutCubic' },
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: opts.legend !== false, labels: { color: COL.ink, font: { family: 'IBM Plex Sans', size: 12 }, boxWidth: 14, boxHeight: 3, usePointStyle: false } },
+            tooltip: { backgroundColor: COL.ink, titleFont: { family: 'IBM Plex Mono', size: 11 }, bodyFont: { family: 'IBM Plex Mono', size: 11.5 }, padding: 9, cornerRadius: 4,
+              callbacks: { label: (c) => ' ' + c.dataset.label + ': ' + (fmt ? fmt(c.raw) : c.raw) } }
+          },
+          scales: {
+            x: { grid: { color: COL.line, drawTicks: false }, ticks: { color: COL.slate, font: { family: 'IBM Plex Mono', size: 11 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 11 }, title: { display: !!xTitle, text: xTitle, color: COL.slate, font: { family: 'IBM Plex Mono', size: 11 } } },
+            y: Object.assign({ grid: { color: COL.line, drawTicks: false }, ticks: { color: COL.slate, font: { family: 'IBM Plex Mono', size: 11 }, callback: (v) => fmt ? fmt(v) : v }, title: { display: !!yTitle, text: yTitle, color: COL.slate, font: { family: 'IBM Plex Mono', size: 11 } } }, opts.y || {})
+          }
+        };
+      }
+      const line = (label, data, color, extra) => Object.assign({ label, data, borderColor: color, backgroundColor: 'transparent', borderWidth: 2.4, pointRadius: 0, tension: 0.18 }, extra || {});
+
+      /* ================= embedded life-cycle model ================= */
+      function lifeModel(){
+        const startAge=23, retire=60, life=85, CTC=1200000, tax=0.15, gInc=0.08, c0=0.70, gExp=0.07, ret=0.09, infl=0.06, disc=0.09;
+        const N=retire-startAge, T=life-startAge;
+        const C0 = c0*CTC*(1-tax);
+        const post=[], cons=[], gross=[];
+        for(let t=0;t<T;t++){
+          let g=0,yd=0,ct=0;
+          if(t<N){ g=CTC*Math.pow(1+gInc,t); yd=g*(1-tax); ct=C0*Math.pow(1+gExp,t); }
+          else { const cLast=C0*Math.pow(1+gExp,N-1); ct=cLast*Math.pow(1+infl,t-(N-1)); }
+          gross.push(g); post.push(yd); cons.push(ct);
+        }
+        const wealth=[]; let w=0;
+        for(let t=0;t<T;t++){ w = w*(1+ret) + (post[t]-cons[t]); wealth.push(Math.max(w,0)); }
+        const hc=[];
+        for(let i=0;i<T;i++){ let sum=0; for(let k=i;k<N;k++){ sum += post[k]/Math.pow(1+disc,k-i); } hc.push(sum); }
+        const rows=[];
+        for(let t=0;t<T;t++) rows.push({ age:startAge+t, gross:gross[t], cons:cons[t], wealth:wealth[t], hc:hc[t] });
+        return rows;
+      }
+
+      /* ================= slide controller ================= */
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      const TOTAL = slides.length;
+      let cur = 0;
+      const initialized = {};
+      const pad = (n) => String(n).padStart(2, '0');
+
+      function show(i){
+        i = Math.max(0, Math.min(TOTAL-1, i));
+        slides[cur].classList.remove('active');
+        cur = i;
+        slides[cur].classList.add('active');
+        $('progress').style.width = ((cur+1)/TOTAL*100) + '%';
+        $('count').textContent = pad(cur+1) + ' / ' + pad(TOTAL);
+        $('slug').textContent = slides[cur].dataset.slug;
+        document.querySelectorAll('.ovcell').forEach((c,idx)=>c.classList.toggle('here', idx===cur));
+        if (!initialized[cur]) { initialized[cur] = true; if (initFns[cur]) requestAnimationFrame(()=>initFns[cur]()); }
+        try { history.replaceState(null,'','#'+(cur+1)); } catch(e){}
+      }
+      const next = () => show(cur+1);
+      const prev = () => show(cur-1);
+
+      document.addEventListener('keydown', (e)=>{
+        if (['INPUT','TEXTAREA'].includes(document.activeElement.tagName) && ['ArrowLeft','ArrowRight'].includes(e.key)) return;
+        if (e.key==='ArrowRight' || e.key===' ' || e.key==='PageDown'){ e.preventDefault(); next(); }
+        else if (e.key==='ArrowLeft' || e.key==='PageUp'){ e.preventDefault(); prev(); }
+        else if (e.key==='Home'){ show(0); }
+        else if (e.key==='End'){ show(TOTAL-1); }
+        else if (e.key.toLowerCase()==='o'){ toggleOverview(); }
+        else if (e.key.toLowerCase()==='f'){ toggleFs(); }
+        else if (e.key==='Escape'){ $('overview').classList.remove('on'); }
+      });
+      $('next').onclick = next; $('prev').onclick = prev;
+
+      // overview
+      const ovgrid = $('ovgrid');
+      slides.forEach((s,idx)=>{
+        const b = document.createElement('button');
+        b.className = 'ovcell';
+        b.innerHTML = '<div class="on">'+pad(idx+1)+'</div><div class="ot">'+s.dataset.slug+'</div>';
+        b.onclick = ()=>{ show(idx); $('overview').classList.remove('on'); };
+        ovgrid.appendChild(b);
+      });
+      function toggleOverview(){ $('overview').classList.toggle('on'); }
+      $('ovBtn').onclick = toggleOverview;
+      function toggleFs(){ if(!document.fullscreenElement){ document.documentElement.requestFullscreen?.(); } else { document.exitFullscreen?.(); } }
+      $('fsBtn').onclick = toggleFs;
+
+      // swipe (touch)
+      let tx=0; document.addEventListener('touchstart',e=>tx=e.changedTouches[0].clientX,{passive:true});
+      document.addEventListener('touchend',e=>{ const dx=e.changedTouches[0].clientX-tx; if(Math.abs(dx)>60){ dx<0?next():prev(); } },{passive:true});
+
+      /* ================= per-slide initializers ================= */
+      const initFns = {};
+
+      // 06 · pizza pie (index 5)
+      function drawPizza(){
+        const svg = $('pizzaSvg'); if(!svg) return;
+        const cx=160, cy=150, r=118;
+        const data=[ {v:15, c:COL.rust, t:'Taxes 15%'}, {v:59.5, c:COL.amber, t:'Today 59.5%'}, {v:25.5, c:COL.teal, t:'Frozen 25.5%'} ];
+        const polar=(ang)=>{ const a=(ang-90)*Math.PI/180; return [cx+r*Math.cos(a), cy+r*Math.sin(a)]; };
+        let ang=0, out='';
+        // crust ring
+        out += '<circle cx="'+cx+'" cy="'+cy+'" r="'+(r+6)+'" fill="none" stroke="'+COL.lineStrong+'" stroke-width="3"/>';
+        data.forEach(d=>{
+          const a0=ang, a1=ang+d.v/100*360; ang=a1;
+          const [x0,y0]=polar(a0),[x1,y1]=polar(a1);
+          const large = (a1-a0)>180?1:0;
+          out += '<path d="M'+cx+','+cy+' L'+x0.toFixed(2)+','+y0.toFixed(2)+' A'+r+','+r+' 0 '+large+' 1 '+x1.toFixed(2)+','+y1.toFixed(2)+' Z" fill="'+d.c+'" stroke="'+COL.panel+'" stroke-width="2.5"/>';
+          const mid=(a0+a1)/2, [lx,ly]=(function(){const a=(mid-90)*Math.PI/180;return [cx+r*0.62*Math.cos(a), cy+r*0.62*Math.sin(a)];})();
+          out += '<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" fill="#fff" font-family="IBM Plex Mono" font-size="13" font-weight="600" text-anchor="middle" dominant-baseline="middle">'+d.v+'%</text>';
+        });
+        // snowflake marker on frozen wedge
+        out += '<text x="'+cx+'" y="'+(cy+r*0.34)+'" font-size="20" text-anchor="middle">❄</text>';
+        svg.innerHTML = out;
+      }
+      drawPizza(); // svg is safe to draw immediately
+
+      // 08 · vote (index 7)
+      const votes = { a:0, b:0 };
+      function paintVotes(){
+        const t = votes.a + votes.b;
+        const pa = t? Math.round(votes.a/t*100):0, pb = t? 100-pa:0;
+        $('fillA').style.width = (t?votes.a/t*100:0)+'%';
+        $('fillB').style.width = (t?votes.b/t*100:0)+'%';
+        $('pctA').textContent = pa+'%'; $('pctB').textContent = pb+'%';
+      }
+      function initVote(){
+        document.querySelectorAll('[data-vote]').forEach(btn=>{
+          btn.onclick = ()=>{ const k=btn.dataset.vote, d=+btn.dataset.d; votes[k]=Math.max(0,votes[k]+d); $('vote'+k.toUpperCase()).value=votes[k]; paintVotes(); };
+        });
+        $('voteA').oninput = ()=>{ votes.a=Math.max(0,+$('voteA').value||0); paintVotes(); };
+        $('voteB').oninput = ()=>{ votes.b=Math.max(0,+$('voteB').value||0); paintVotes(); };
+        paintVotes();
+      }
+      initFns[7] = initVote;
+
+      // 09 · penny reveal (index 8)
+      initFns[8] = function(){
+        const days = Array.from({length:30}, (_,i)=>i+1);
+        const penny = days.map(d=>0.01*Math.pow(2,d-1));
+        const million = days.map(()=>1e6);
+        new Chart($('pennyChart'), {
+          type:'line',
+          data:{ labels:days, datasets:[ line('Penny doubling', penny, COL.amber, {borderWidth:2.6}), line('$1,000,000', million, COL.ink, {borderDash:[5,4], borderWidth:1.6}) ] },
+          options: baseOpts('Day','', usd, { y:{ type:'logarithmic', min:0.01 } })
+        });
+      };
+
+      // 10 · future value (index 9)
+      initFns[9] = function(){
+        const ctx = $('fvChart');
+        let chart;
+        function calc(){
+          const pv=+$('fvPV').value, r=+$('fvR').value/100, n=+$('fvN').value;
+          $('fvPVout').textContent = inrCompact(pv);
+          $('fvRout').textContent = (+$('fvR').value)+'%';
+          $('fvNout').textContent = n;
+          const yrs = Array.from({length:n+1},(_,i)=>i);
+          const bal = yrs.map(t=>pv*Math.pow(1+r,t));
+          const prin = yrs.map(()=>pv);
+          const fv = pv*Math.pow(1+r,n);
+          $('fvResult').textContent = inrCompact(fv);
+          $('fvFormula').innerHTML = 'FV = '+inrCompact(pv)+' · (1 + <span class="sub">'+(+$('fvR').value)+'%</span>)<sup>'+n+'</sup> = <span class="res">'+inrCompact(fv)+'</span>';
+          if(!chart){
+            chart = new Chart(ctx,{ type:'line',
+              data:{ labels:yrs, datasets:[ line('Balance', bal, COL.teal, {fill:'+1', backgroundColor:'rgba(14,124,102,0.10)', borderWidth:2.6}), line('Principal', prin, COL.slate, {borderDash:[4,4], borderWidth:1.4}) ] },
+              options: baseOpts('Years','', inrCompact) });
+          } else {
+            chart.data.labels=yrs; chart.data.datasets[0].data=bal; chart.data.datasets[1].data=prin; chart.update();
+          }
+        }
+        ['fvPV','fvR','fvN'].forEach(id=>$(id).oninput=calc);
+        calc();
+      };
+
+      // 12 · present value (index 11)
+      initFns[11] = function(){
+        const ctx = $('pvChart'); let chart;
+        function calc(){
+          const fv=+$('pvFV').value, r=+$('pvR').value/100, n=+$('pvN').value;
+          $('pvFVout').textContent = inrCompact(fv);
+          $('pvRout').textContent = (+$('pvR').value)+'%';
+          $('pvNout').textContent = n;
+          const yrs = Array.from({length:n+1},(_,i)=>i);
+          const val = yrs.map(t=>fv/Math.pow(1+r,t));
+          const pv = fv/Math.pow(1+r,n);
+          $('pvResult').textContent = inrCompact(pv);
+          $('pvFormula').innerHTML = 'PV = '+inrCompact(fv)+' / (1 + <span class="sub">'+(+$('pvR').value)+'%</span>)<sup>'+n+'</sup> = <span class="res">'+inrCompact(pv)+'</span>';
+          if(!chart){
+            chart = new Chart(ctx,{ type:'line',
+              data:{ labels:yrs, datasets:[ line("Today's value", val, COL.blue, {fill:'origin', backgroundColor:'rgba(59,108,140,0.10)', borderWidth:2.6}) ] },
+              options: baseOpts('Years until received','', inrCompact, {legend:false}) });
+          } else { chart.data.labels=yrs; chart.data.datasets[0].data=val; chart.update(); }
+        }
+        ['pvFV','pvR','pvN'].forEach(id=>$(id).oninput=calc);
+        calc();
+      };
+
+      // 14 · persona game (index 13)
+      initFns[13] = function(){
+        const btn = $('revealBtn'); if(btn.dataset.done) return;
+        btn.onclick = ()=>{
+          $('ageA').textContent = '22 yrs'; $('ageA').className='fig reveal-age';
+          $('ageB').textContent = '65 yrs'; $('ageB').className='fig reveal-age';
+          $('hcA').textContent = '≈ ₹3.2 Cr'; $('hcB').textContent = '₹0';
+          $('verdict').innerHTML = 'Person <span class="attn">A</span> is far richer — they own <b>40 years of future salary</b>.';
+          btn.textContent = 'Revealed ✓'; btn.disabled = true; btn.dataset.done='1';
+        };
+      };
+
+      // 16 · auction (index 15)
+      initFns[15] = function(){
+        function calc(){
+          const m=+$('auM').value, y=+$('auY').value, r=+$('auR').value/100;
+          $('auMout').textContent = inrCompact(m);
+          $('auYout').textContent = y;
+          $('auRout').textContent = (+$('auR').value)+'%';
+          const annual = m*12;
+          // PV of an annuity: A * (1 - (1+r)^-y) / r
+          const pv = r===0 ? annual*y : annual*(1-Math.pow(1+r,-y))/r;
+          $('auResult').textContent = inrCompact(pv);
+          $('auNote').textContent = inrGroup(annual)+' / yr for '+y+' yrs, discounted at '+(+$('auR').value)+'%';
+        }
+        ['auM','auY','auR'].forEach(id=>$(id).oninput=calc);
+        calc();
+      };
+
+      // 17 · human vs financial capital — composition (index 16)
+      initFns[16] = function(){
+        const rows = lifeModel();
+        const ages = rows.map(r=>r.age);
+        const hpct = rows.map(r=>{ const t=r.hc+r.wealth; return t>0 ? r.hc/t*100 : 0; });
+        const fpct = rows.map(r=>{ const t=r.hc+r.wealth; return t>0 ? r.wealth/t*100 : 0; });
+        new Chart($('hcfcChart'),{ type:'line',
+          data:{ labels:ages, datasets:[
+            line('Human capital %', hpct, COL.blue, {fill:'origin', backgroundColor:'rgba(59,108,140,0.10)', borderWidth:2.6}),
+            line('Financial capital %', fpct, COL.teal, {fill:'origin', backgroundColor:'rgba(14,124,102,0.10)', borderWidth:2.6})
+          ] },
+          options: baseOpts('Age','Share of total wealth', (v)=>Math.round(v)+'%', { y:{ min:0, max:100 } }) });
+      };
+
+      // 18 · LCH — stylized textbook hump (index 17)
+      initFns[17] = function(){
+        const startAge=23, retire=60, life=85;
+        const ages=[]; for(let a=startAge;a<=life;a++) ages.push(a);
+        const income = ages.map(a=>{ if(a>=retire) return 0; const peak=2600000; return Math.max(peak*(1-Math.pow((a-48)/24,2)), 300000); });
+        const cstar = income.reduce((s,x)=>s+x,0)/ages.length;
+        const cons = ages.map(()=>cstar);
+        let w=0; const wealth = ages.map((a,i)=>{ w += income[i]-cstar; return w; });
+        new Chart($('lchChart'),{ type:'line',
+          data:{ labels:ages, datasets:[
+            line('Income', income, COL.blue, {borderWidth:2.4}),
+            line('Consumption', cons, COL.amber, {borderWidth:2.2, borderDash:[5,4]}),
+            line('Wealth', wealth, COL.teal, {fill:'origin', backgroundColor:'rgba(14,124,102,0.10)', borderWidth:2.8})
+          ] },
+          options: baseOpts('Age','', inrCompact) });
+      };
+
+      // 19 · PIH (index 18)
+      initFns[18] = function(){
+        const T=30; const ages=Array.from({length:T},(_,i)=>25+i);
+        const base=800000;
+        // wobbly transitory income around a rising permanent trend
+        const wob=[0.05,-0.08,0.12,-0.03,0.09,-0.11,0.06,0.14,-0.05,0.02,-0.09,0.11,-0.04,0.07,-0.12,0.05,0.10,-0.06,0.03,-0.08,0.09,-0.02,0.13,-0.10,0.04,0.08,-0.05,0.11,-0.03,0.06];
+        let chart; let windfall=false;
+        function build(){
+          const income = ages.map((a,i)=> base*Math.pow(1.03,i)*(1+wob[i]) + (windfall && i===9 ? 500000:0) );
+          // permanent income ≈ smoothed level; consumption tracks it with a tiny lift from windfall
+          const perm = ages.map((a,i)=> base*Math.pow(1.03,i) + (windfall ? 500000/T : 0) );
+          if(!chart){
+            chart = new Chart($('pihChart'),{ type:'line',
+              data:{ labels:ages, datasets:[ line('Income', income, COL.slate, {borderWidth:1.8, tension:0.05}), line('Consumption', perm, COL.teal, {borderWidth:2.8}) ] },
+              options: baseOpts('Age','', inrCompact) });
+          } else { chart.data.datasets[0].data=income; chart.data.datasets[1].data=perm; chart.update(); }
+        }
+        $('windfallBtn').onclick = ()=>{ windfall=!windfall; $('windfallBtn').textContent = windfall? 'Remove the windfall ✕':'Drop a ₹5 L windfall →'; build(); };
+        build();
+      };
+
+      /* ---------- boot ---------- */
+      const start = parseInt((location.hash||'').replace('#',''),10);
+      show(Number.isFinite(start) && start>=1 && start<=TOTAL ? start-1 : 0);
+    </script>
+  </body>
+</html>
