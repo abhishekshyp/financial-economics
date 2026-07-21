@@ -6,19 +6,6 @@ Ready, set, go! https://abhishekshyp.github.io/financial-economics
 
 ---
 
-## Tutorial structure — what to expect
-
-Every tutorial is designed to maximize learning through active engagement, and follows the same four-part rhythm:
-
-1. **Play** — a game or interactive tool to build intuition *before* the theory.
-2. **Lecture slides** — the concepts, models, and frameworks.
-3. **Questions** — in-session checks to consolidate understanding.
-4. **Assignment** — a graded, take-home task that applies the tutorial.
-
-There are **10 tutorials**, and **each one carries a graded assignment**.
-
----
-
 ## Course details
 
 | Week | Tutorial |
@@ -32,6 +19,19 @@ There are **10 tutorials**, and **each one carries a graded assignment**.
 | **8** | **Other Ways to Hedge Risk** — *diversification, options, insurance — tools beyond just holding cash* |
 | **9** | **Active Investing: Direct Equity, DIY** — *think you can pick stocks? let's check your smartness* |
 | **10** | **Lazy Investing** — *do less, win more? the case for going passive* |
+
+---
+
+## Tutorial structure — what to expect
+
+Every tutorial is designed to maximize learning through active engagement, and follows the same four-part rhythm:
+
+1. **Play** — a game or interactive tool to build intuition *before* the theory.
+2. **Lecture slides** — the concepts, models, and frameworks.
+3. **Questions** — in-session checks to consolidate understanding.
+4. **Assignment** — a graded, take-home task that applies the tutorial.
+
+There are **10 tutorials**, and **each one carries a graded assignment**.
 
 ---
 
