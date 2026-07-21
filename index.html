@@ -3,202 +3,239 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <title>Financial Economics</title>
-
+    <title>Financial Economics — Interactive Tutorials</title>
+    <meta name="description" content="Interactive tutorials, simulations, and classroom activities for learning Financial Economics through experimentation and coding." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
-
     <style>
       :root {
         --paper: #f1f3ef;
         --panel: #fbfcfa;
-
         --ink: #182129;
         --ink-soft: #4a5760;
         --ink-faint: #8b979e;
-
         --line: #d7dcd4;
         --line-strong: #c3cabf;
-
         --teal: #0e7c66;
         --teal-deep: #0a5a4a;
-
-        --shadow:
-          0 1px 2px rgba(24, 33, 41, 0.05), 0 10px 30px rgba(24, 33, 41, 0.1);
-
+        --blue: #3b6c8c;
+        --amber: #b9822b;
+        --shadow: 0 1px 2px rgba(24, 33, 41, 0.05), 0 10px 30px -14px rgba(24, 33, 41, 0.16);
         --radius: 4px;
       }
-
-      * {
-        box-sizing: border-box;
-      }
-
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
       body {
         margin: 0;
+        color: var(--ink);
+        font-family: "IBM Plex Sans", system-ui, sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        letter-spacing: -0.005em;
+        -webkit-font-smoothing: antialiased;
         background:
           linear-gradient(var(--paper), var(--paper)),
-          repeating-linear-gradient(
-            0deg,
-            transparent 0 28px,
-            rgba(24, 33, 41, 0.03) 28px 29px
-          ),
-          repeating-linear-gradient(
-            90deg,
-            transparent 0 28px,
-            rgba(24, 33, 41, 0.03) 28px 29px
-          );
-        color: var(--ink);
-        font-family: "IBM Plex Sans", sans-serif;
+          repeating-linear-gradient(0deg, transparent 0 27px, rgba(24, 33, 41, 0.032) 27px 28px),
+          repeating-linear-gradient(90deg, transparent 0 27px, rgba(24, 33, 41, 0.032) 27px 28px);
       }
+      .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+      a { color: var(--teal-deep); }
 
+      /* ---------- header ---------- */
       header {
-        padding: 60px 10vw 40px;
-        border-bottom: 1px solid var(--line-strong);
+        max-width: 1180px; margin: 0 auto;
+        padding: clamp(48px, 8vw, 92px) clamp(22px, 5vw, 40px) clamp(30px, 4vw, 44px);
+        position: relative;
       }
-
       .eyebrow {
-        font-family: "IBM Plex Mono";
-        font-size: 12px;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        color: var(--teal-deep);
+        font-family: "IBM Plex Mono"; font-size: 12px; letter-spacing: 0.22em;
+        text-transform: uppercase; color: var(--teal-deep); font-weight: 500;
+        display: flex; align-items: center; gap: 12px;
       }
-
+      .eyebrow::after { content: ""; width: 46px; height: 1px; background: var(--line-strong); }
       h1 {
-        font-family: "Fraunces", serif;
-        font-size: clamp(42px, 7vw, 72px);
-        margin: 0.2em 0 0.15em;
-        font-weight: 600;
-        line-height: 1;
+        font-family: "Fraunces", Georgia, serif; font-weight: 600;
+        font-size: clamp(44px, 8vw, 88px); line-height: 0.98;
+        margin: 0.2em 0 0.24em; letter-spacing: -0.015em; max-width: 15ch;
+      }
+      h1 em { font-style: italic; font-weight: 400; color: var(--teal-deep); }
+      .lead { max-width: 64ch; color: var(--ink-soft); font-size: clamp(16px, 1.7vw, 19px); line-height: 1.62; margin: 0; }
+      .meta {
+        margin-top: clamp(24px, 4vw, 40px); display: flex; flex-wrap: wrap; gap: 10px 26px;
+        font-family: "IBM Plex Mono"; font-size: 13px; color: var(--ink-soft);
+        border-top: 1px solid var(--line); padding-top: 20px;
+      }
+      .meta .k { display: inline-flex; align-items: baseline; gap: 7px; }
+      .meta .k b { color: var(--ink); font-weight: 500; }
+      .meta a { text-decoration: none; border-bottom: 1px solid rgba(14,124,102,0.3); }
+      .meta a:hover { border-color: var(--teal); }
+
+      /* ---------- main ---------- */
+      main { max-width: 1180px; margin: 0 auto; padding: clamp(20px, 3vw, 34px) clamp(22px, 5vw, 40px) 60px; }
+      .sectlabel {
+        font-family: "IBM Plex Mono"; font-size: 11.5px; letter-spacing: 0.16em; text-transform: uppercase;
+        color: var(--ink-faint); display: flex; align-items: center; gap: 12px; margin: clamp(26px, 4vw, 44px) 0 18px;
+      }
+      .sectlabel::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+      .sectlabel .idx { color: var(--teal-deep); }
+
+      /* ---------- featured module ---------- */
+      .featured {
+        background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+        box-shadow: var(--shadow); overflow: hidden;
+      }
+      .featured .body { padding: clamp(24px, 3.4vw, 40px); }
+      .modtag {
+        display: inline-flex; align-items: center; gap: 9px; font-family: "IBM Plex Mono";
+        font-size: 12px; color: var(--teal-deep); letter-spacing: 0.08em;
+      }
+      .modtag .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 3px rgba(14,124,102,0.14); }
+      .featured h2 { font-family: "Fraunces", serif; font-weight: 600; font-size: clamp(28px, 3.6vw, 40px); line-height: 1.05; margin: 16px 0 12px; letter-spacing: -0.01em; }
+      .featured p { color: var(--ink-soft); font-size: 15.5px; line-height: 1.62; margin: 0 0 20px; max-width: 52ch; }
+      .tags { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 26px; }
+      .tag {
+        font-family: "IBM Plex Mono"; font-size: 11.5px; color: var(--ink-soft);
+        background: rgba(24,33,41,0.045); border: 1px solid var(--line);
+        padding: 4px 10px; border-radius: 999px;
+      }
+      .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+      .btn {
+        display: inline-flex; align-items: center; gap: 9px; text-decoration: none;
+        font-family: "IBM Plex Mono"; font-size: 14px; font-weight: 500;
+        padding: 12px 20px; border-radius: var(--radius); border: 1px solid; cursor: pointer;
+        transition: background 0.16s, border-color 0.16s, color 0.16s, transform 0.08s;
+      }
+      .btn svg { width: 16px; height: 16px; flex: none; }
+      .btn.primary { background: var(--teal); border-color: var(--teal); color: var(--paper); }
+      .btn.primary:hover { background: var(--teal-deep); border-color: var(--teal-deep); }
+      .btn.secondary { background: transparent; border-color: var(--line-strong); color: var(--ink); }
+      .btn.secondary:hover { border-color: var(--teal); color: var(--teal-deep); background: rgba(14,124,102,0.05); }
+      .btn:active { transform: translateY(1px); }
+      .btn:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+
+      /* plotted-curve panel (the signature) */
+      .featured .viz {
+        border-left: 1px solid var(--line); position: relative; min-height: 200px;
+        background:
+          linear-gradient(var(--panel), var(--panel)),
+          repeating-linear-gradient(0deg, transparent 0 22px, rgba(24,33,41,0.03) 22px 23px),
+          repeating-linear-gradient(90deg, transparent 0 22px, rgba(24,33,41,0.03) 22px 23px);
+        background-clip: padding-box; display: flex; flex-direction: column; justify-content: flex-end;
+      }
+      @media (max-width: 780px) { .featured .viz { border-left: none; border-top: 1px solid var(--line); min-height: 170px; } }
+      .featured .viz svg { width: 100%; height: 100%; display: block; }
+      .viz .vlabel {
+        position: absolute; top: 14px; left: 16px; font-family: "IBM Plex Mono";
+        font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint);
       }
 
-      .lead {
-        max-width: 760px;
-        color: var(--ink-soft);
-        font-size: 18px;
-        line-height: 1.7;
+      /* ---------- upcoming grid ---------- */
+      .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+      .soon {
+        background: transparent; border: 1px dashed var(--line-strong); border-radius: var(--radius);
+        padding: 22px; color: var(--ink-faint);
       }
+      .soon .num { font-family: "IBM Plex Mono"; font-size: 12px; color: var(--ink-faint); letter-spacing: 0.08em; }
+      .soon h3 { font-family: "Fraunces", serif; font-weight: 500; font-size: 20px; color: var(--ink-soft); margin: 10px 0 8px; }
+      .soon .status { font-family: "IBM Plex Mono"; font-size: 11.5px; color: var(--ink-faint); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; display: inline-block; margin-top: 6px; }
 
-      main {
-        max-width: 1200px;
-        margin: auto;
-        padding: 50px 30px 80px;
-      }
-
-      .section {
-        margin-bottom: 45px;
-      }
-
-      .section-title {
-        font-family: "IBM Plex Mono";
-        text-transform: uppercase;
-        letter-spacing: 0.18em;
-        color: var(--teal-deep);
-        font-size: 12px;
-        margin-bottom: 20px;
-      }
-
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-        gap: 18px;
-      }
-
-      .card {
-        display: block;
-        text-decoration: none;
-        color: inherit;
-        background: var(--panel);
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        padding: 22px;
-        box-shadow: var(--shadow);
-        transition: 0.2s;
-      }
-
-      .card:hover {
-        transform: translateY(-4px);
-        border-color: var(--teal);
-        box-shadow: 0 12px 35px rgba(24, 33, 41, 0.12);
-      }
-
-      .card-number {
-        font-family: "IBM Plex Mono";
-        color: var(--teal);
-        font-size: 12px;
-        margin-bottom: 12px;
-      }
-
-      .card h2 {
-        margin: 0 0 10px;
-        font-size: 24px;
-        font-family: "Fraunces", serif;
-        font-weight: 500;
-      }
-
-      .card p {
-        margin: 0;
-        color: var(--ink-soft);
-        line-height: 1.6;
-      }
-
-      .status {
-        margin-top: 18px;
-        display: inline-block;
-        font-size: 12px;
-        font-family: "IBM Plex Mono";
-        padding: 5px 10px;
-        border-radius: 999px;
-        background: rgba(14, 124, 102, 0.08);
-        color: var(--teal-deep);
-      }
-
+      /* ---------- footer ---------- */
       footer {
-        border-top: 1px solid var(--line);
-        padding: 24px;
-        text-align: center;
-        color: var(--ink-faint);
-        font-family: "IBM Plex Mono";
-        font-size: 12px;
+        border-top: 1px solid var(--line-strong); margin-top: 30px;
+        padding: 26px clamp(22px, 5vw, 40px); text-align: center;
+        color: var(--ink-faint); font-family: "IBM Plex Mono"; font-size: 12px;
       }
+      footer a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px solid var(--line-strong); }
+      footer a:hover { color: var(--teal-deep); border-color: var(--teal); }
+      footer .sep { margin: 0 10px; color: var(--line-strong); }
+
+      @media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
     </style>
   </head>
-
   <body>
     <header>
-      <div class="eyebrow">Welcome!</div>
-      <h1>Financial Economics Tutorial</h1>
+      <div class="eyebrow">Interactive Course</div>
+      <h1>Financial<br /><em>Economics</em></h1>
       <p class="lead">
-        A collection of interactive tutorials, simulations, datasets, and
-        classroom activities designed to teach Financial Economics through
-        experimentation, coding, and real-world decision making.
+        Tutorials, simulations, and classroom activities that teach financial economics
+        through experimentation, coding, and real-world decision making — every idea made
+        concrete by a model you can open and interrogate.
       </p>
+      <div class="meta">
+        <span class="k">Instructor <b>Abhishek Kashyap</b></span>
+        <span class="k">Contact <a href="mailto:abhishek_k@hs.iitr.ac.in">abhishek_k@hs.iitr.ac.in</a></span>
+        <span class="k">Format <b>Web-based · Open access</b></span>
+      </div>
     </header>
 
     <main>
-      <div class="section">
-        <div class="section-title">Course Modules</div>
-        <div class="grid">
-          <a class="card" href="Week1_BuildYourFinancialLife/">
-            <div class="card-number">Week 01</div>
-            <h2>Build Your Financial Life</h2>
-            <p>
-              Build a lifetime financial model that estimates income,
-              consumption, savings, borrowing, retirement wealth and human
-              capital.
-            </p>
-            <div class="status">Interactive Web Application</div>
-          </a>
+      <div class="sectlabel"><span class="idx">01</span> Course Modules</div>
+
+      <!-- Featured: Week 1 -->
+      <section class="featured">
+        <div class="body">
+          <span class="modtag"><span class="dot"></span> Week 01 · Live</span>
+          <h2>Build Your Financial Life</h2>
+          <p>
+            Turn a handful of career and spending assumptions into a full lifetime of income,
+            consumption, saving, and wealth — and use it to learn the life-cycle and permanent-income
+            hypotheses, human vs. financial capital, and the time value of money.
+          </p>
+          <div class="tags">
+            <span class="tag">Life-Cycle Hypothesis</span>
+            <span class="tag">Permanent Income</span>
+            <span class="tag">Human Capital</span>
+            <span class="tag">Time Value of Money</span>
+          </div>
+          <div class="actions">
+            <a class="btn primary" href="https://abhishekshyp.github.io/financial-economics/Week1_BuildYourFinancialLife/sl_FinancialLifeModel#1">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1.5" y="2.5" width="13" height="9" rx="1" />
+                <path d="M6.4 6.1v3l2.5-1.5z" fill="currentColor" stroke="none" />
+                <path d="M8 11.5v2M5.6 13.9h4.8" />
+              </svg>
+              Open slides
+            </a>
+            <a class="btn secondary" href="https://abhishekshyp.github.io/financial-economics/Week1_BuildYourFinancialLife/">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                <path d="M2 4.2h12M2 8h12M2 11.8h12" />
+                <circle cx="6" cy="4.2" r="1.7" fill="var(--panel)" />
+                <circle cx="10.4" cy="8" r="1.7" fill="var(--panel)" />
+                <circle cx="5" cy="11.8" r="1.7" fill="var(--panel)" />
+              </svg>
+              Launch the model
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <div class="sectlabel"><span class="idx">02</span> Upcoming</div>
+      <div class="grid">
+        <div class="soon">
+          <div class="num">Week 02</div>
+          <h3>In preparation</h3>
+          <span class="status">Coming soon</span>
+        </div>
+        <div class="soon">
+          <div class="num">Week 03</div>
+          <h3>In preparation</h3>
+          <span class="status">Coming soon</span>
+        </div>
+        <div class="soon">
+          <div class="num">Week 04</div>
+          <h3>In preparation</h3>
+          <span class="status">Coming soon</span>
         </div>
       </div>
     </main>
 
-    <footer>Financial Economics • Interactive Tutorials • GitHub Pages</footer>
+    <footer>
+      Financial Economics <span class="sep">•</span> Abhishek Kashyap
+      <span class="sep">•</span> <a href="https://github.com/abhishekshyp/financial-economics">Source on GitHub</a>
+    </footer>
   </body>
 </html>
