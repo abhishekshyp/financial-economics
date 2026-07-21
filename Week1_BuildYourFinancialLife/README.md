@@ -15,6 +15,10 @@ week1-build-your-financial-life/
 └── README.md                   # this file
 ```
 
+## Live access
+Week 01 Slides: https://abhishekshyp.github.io/financial-economics/Week1_BuildYourFinancialLife/sl_FinancialLifeModel#1
+Week 01 Tool: https://abhishekshyp.github.io/financial-economics/Week1_BuildYourFinancialLife/
+
 ---
 
 ## What the two files do
