@@ -16,9 +16,9 @@ week1-build-your-financial-life/
 ```
 
 ## Live access
-Week 01 Slides: https://abhishekshyp.github.io/financial-economics/Week1_BuildYourFinancialLife/sl_FinancialLifeModel#1
+Week 1 Slides: https://abhishekshyp.github.io/financial-economics/Week1_BuildYourFinancialLife/sl_FinancialLifeModel#1
 
-Week 01 Tool: https://abhishekshyp.github.io/financial-economics/Week1_BuildYourFinancialLife/
+Week 1 Tool: https://abhishekshyp.github.io/financial-economics/Week1_BuildYourFinancialLife/
 
 ---
 
