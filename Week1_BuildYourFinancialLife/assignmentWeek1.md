@@ -139,7 +139,7 @@ RollNumber_FullName.extension
 ```
 
 *(e.g. `21112001_AbhishekKashyap.ipynb`, `..._Model.xlsx`, or `..._Tool.html`.)*
-For **teams**, submit **one** file named with the **team lead's** `RollNumber_FullName`, and list every member's name and roll number on the first page of the write-up (or as a header comment in the code). *— confirm this convention with the instructor if unsure.*
+For **teams**, submit **one** file named with the **team lead's** `RollNumber_FullName`, and list every member's name and roll number on the first page of the write-up (or as a header comment in the code).
 
 ---
 
