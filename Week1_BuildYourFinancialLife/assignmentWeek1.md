@@ -15,7 +15,7 @@ You do **not** need a perfect model. You need a *thoughtful* one, with every ass
 
 ---
 
-## Extension 1 — Income is uncertain (relax *"No Uncertainty"*)
+## Extension 1 — Income is uncertain
 
 The base model assumes your income arrives on schedule, every year, forever. Real incomes don't behave like that. People lose jobs, take pay cuts, fall ill, start over. The single most important stress test of any financial plan is: **what happens in a bad year?**
 
@@ -34,7 +34,7 @@ The base model assumes your income arrives on schedule, every year, forever. Rea
 
 ---
 
-## Extension 2 — The glide path (relax *"A single constant return"*)
+## Extension 2 — The glide path
 
 The base model earns one flat return (9%) for life. But human-capital theory says that's wrong. When you are **young, your human capital is large and relatively bond-like** (a fairly safe future salary stream), so you can afford to take *more* risk with your small financial portfolio — hold more equity. As you **age, human capital runs down**, so you **de-risk** — shift from equity toward debt/safe assets. Your return should therefore **change every year**, not stay constant.
 
@@ -52,7 +52,7 @@ The base model earns one flat return (9%) for life. But human-capital theory say
 
 ---
 
-## Extension 3 — Real life is lumpy (relax *"Smooth, exogenous consumption"*)
+## Extension 3 — Real life is lumpy
 
 The base model consumes in a smooth curve. Real lives are **lumpy** — big, discrete, often unavoidable outflows land in specific years. Your model should be able to absorb the classic life goals and tell you whether the plan survives them.
 
@@ -113,7 +113,7 @@ Pick **one** of the following. All three are equally acceptable — choose the o
 
 ## Teams
 
-Work **individually or in a team of your choice, up to a maximum of 3 students.** All members are expected to contribute across the four extensions, not split the work into silos and never talk to each other.
+Work **individually or in a team of your choice, up to a maximum of 3 students.** All members are expected to contribute across the four extensions.
 
 ---
 
@@ -123,8 +123,6 @@ Work **individually or in a team of your choice, up to a maximum of 3 students.*
 2. **A short write-up (1–3 pages)** — for each of the four extensions: the assumptions you made, what you changed, the key chart or number, and what you *found*. Close with one paragraph of reflection: what surprised you about your own financial life?
 
 **State every assumption clearly.** A modest model with honest, well-argued assumptions beats an elaborate one you can't defend.
-
-*Suggested weighting (for your own guidance): mechanics correct across the four extensions (40%), clarity and honesty of assumptions (20%), depth of analysis and the questions actually answered (25%), presentation and charts (15%).*
 
 ---
 
