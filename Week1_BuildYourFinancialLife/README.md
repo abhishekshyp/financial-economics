@@ -12,6 +12,8 @@ This is the opening module of the course. A student enters a handful of assumpti
 week1-build-your-financial-life/
 ├── index.html                  # interactive single-file web app
 ├── financial-life-model.xlsx   # live spreadsheet model (formulas, not hardcoded)
+├── sl_FinancialLifeModel.html  # interactive lecture slides
+├── assignmentWeek1.md          # week 1 assignment
 └── README.md                   # this file
 ```
 
