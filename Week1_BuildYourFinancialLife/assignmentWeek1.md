@@ -1,5 +1,5 @@
 # Week 01 — Build Your Financial Life · Assignment
-### Financial Economics Tutorial · Abhishek Kashyap
+### Financial Economics Tutorial
 
 > Think for yourself. Look honestly at your own personal finances — the emergencies, the big purchases, the debts, the good years and the bad ones — and ask: *what did the tool leave out?* Then build it back in.
 
