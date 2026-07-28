@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>What's Your Risk Tolerance? — a risk-tolerance lab</title>
+    <meta
+      name="description"
+      content="The risk-tolerance questionnaire from Bodie, Kane & Marcus (Investments, Ch. 6), scored live on its 9-27 scale."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;450;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --paper: #f1f3ef;
+        --panel: #fbfcfa;
+        --ink: #182129;
+        --ink-soft: #4a5760;
+        --ink-faint: #8b979e;
+        --line: #d7dcd4;
+        --line-strong: #c3cabf;
+        --teal: #0e7c66;
+        --teal-deep: #0a5a4a;
+        --amber: #b9822b;
+        --rust: #b0472b;
+        --blue: #3b6c8c;
+        --slate: #6b7a82;
+        --shadow:
+          0 1px 2px rgba(24, 33, 41, 0.05),
+          0 8px 30px -14px rgba(24, 33, 41, 0.18);
+        --radius: 4px;
+        --paper-grid:
+          repeating-linear-gradient(0deg, transparent 0 27px, rgba(24, 33, 41, 0.032) 27px 28px),
+          repeating-linear-gradient(90deg, transparent 0 27px, rgba(24, 33, 41, 0.032) 27px 28px);
+      }
+      * { box-sizing: border-box; }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "IBM Plex Sans", system-ui, sans-serif;
+        font-weight: 400;
+        font-size: 15px;
+        line-height: 1.5;
+        letter-spacing: -0.005em;
+        -webkit-font-smoothing: antialiased;
+        background-image: linear-gradient(var(--paper), var(--paper)), var(--paper-grid);
+      }
+      .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-feature-settings: "tnum" 1; }
+      h1, h2, h3, .disp { font-family: "Fraunces", Georgia, serif; font-weight: 500; letter-spacing: -0.01em; }
+      em { font-style: italic; color: var(--teal-deep); font-weight: inherit; }
+      a { color: var(--teal-deep); }
+
+      /* ---------- masthead ---------- */
+      .masthead {
+        max-width: 940px;
+        margin: 0 auto;
+        padding: clamp(44px, 8vw, 68px) clamp(20px, 5vw, 40px) 0;
+      }
+      .eyebrow {
+        font-family: "IBM Plex Mono";
+        font-size: 12px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--teal-deep);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .eyebrow::after { content: ""; width: 46px; height: 1px; background: var(--line-strong); }
+      h1 {
+        font-family: "Fraunces", Georgia, serif;
+        font-weight: 600;
+        font-size: clamp(38px, 7vw, 68px);
+        line-height: 1.0;
+        margin: 0.28em 0 0.28em;
+        letter-spacing: -0.015em;
+        max-width: 16ch;
+      }
+      h1 em { font-style: italic; font-weight: 400; color: var(--teal-deep); }
+      .lede {
+        max-width: 78ch;
+        color: var(--ink-soft);
+        font-size: clamp(15px, 1.6vw, 17.5px);
+        line-height: 1.62;
+        margin: 0;
+      }
+      .meta {
+        margin-top: clamp(22px, 4vw, 34px);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 26px;
+        font-family: "IBM Plex Mono";
+        font-size: 12.5px;
+        color: var(--ink-soft);
+        border-top: 1px solid var(--line);
+        padding-top: 18px;
+      }
+      .meta .k { display: inline-flex; align-items: baseline; gap: 7px; }
+      .meta .k b { color: var(--ink); font-weight: 500; }
+
+      /* ---------- main ---------- */
+      main { max-width: 940px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 40px) 60px; }
+      .sectlabel {
+        font-family: "IBM Plex Mono";
+        font-size: 11.5px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: clamp(30px, 5vw, 48px) 0 18px;
+      }
+      .sectlabel::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+      /* ---------- question card ---------- */
+      .qcard {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 18px 20px 16px;
+        margin-bottom: 14px;
+        position: relative;
+        overflow: hidden;
+      }
+      .qcard::before {
+        content: "";
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 3px;
+        background: var(--slate);
+        opacity: 0.7;
+      }
+      .qcard.answered::before { background: var(--teal); opacity: 0.9; }
+      .qhead { display: flex; gap: 12px; align-items: baseline; margin-bottom: 14px; }
+      .qnum {
+        font-family: "IBM Plex Mono";
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--teal-deep);
+        background: rgba(14, 124, 102, 0.07);
+        border: 1px solid rgba(14, 124, 102, 0.16);
+        padding: 2px 8px;
+        border-radius: 3px;
+        white-space: nowrap;
+        line-height: 1.5;
+      }
+      .qtext { font-size: 15.5px; color: var(--ink); line-height: 1.5; font-weight: 450; }
+
+      /* ---------- Q2 context banner ---------- */
+      .qgroup-intro {
+        background: rgba(59, 108, 140, 0.06);
+        border: 1px solid rgba(59, 108, 140, 0.18);
+        border-left: 3px solid var(--blue);
+        border-radius: var(--radius);
+        padding: 13px 16px;
+        margin: 4px 0 14px;
+        font-size: 14px;
+        color: var(--ink-soft);
+        line-height: 1.55;
+      }
+      .qgroup-intro b { color: var(--ink); font-weight: 500; }
+
+      /* ---------- options ---------- */
+      .opts { display: grid; gap: 8px; }
+      .opt {
+        display: flex;
+        gap: 11px;
+        align-items: flex-start;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 11px 13px;
+        cursor: pointer;
+        background: #fff;
+        transition: border-color 0.13s, background 0.13s, box-shadow 0.13s;
+      }
+      .opt:hover { border-color: var(--line-strong); background: #fdfefc; }
+      .opt:focus-visible { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(14, 124, 102, 0.14); }
+      .opt.sel { border-color: var(--teal); background: rgba(14, 124, 102, 0.05); box-shadow: inset 0 0 0 1px var(--teal); }
+      .opt .mark {
+        flex: none;
+        width: 22px; height: 22px;
+        border-radius: 50%;
+        border: 1.5px solid var(--line-strong);
+        display: grid; place-items: center;
+        font-family: "IBM Plex Mono";
+        font-size: 11px; font-weight: 600;
+        color: var(--ink-soft);
+        margin-top: 1px;
+        transition: border-color 0.13s, background 0.13s, color 0.13s;
+      }
+      .opt.sel .mark { border-color: var(--teal); background: var(--teal); color: #fff; }
+      .opt .lbl { font-size: 14.5px; color: var(--ink); line-height: 1.5; }
+      .opt.sel .lbl { color: var(--ink); }
+
+      /* ---------- compute bar ---------- */
+      .computebar {
+        position: sticky;
+        bottom: 0;
+        margin-top: 22px;
+        background: linear-gradient(180deg, rgba(241,243,239,0) 0%, var(--paper) 34%);
+        padding: 20px 0 14px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        z-index: 5;
+      }
+      .progress { font-family: "IBM Plex Mono"; font-size: 13px; color: var(--ink-soft); }
+      .progress b { color: var(--ink); font-weight: 600; }
+      .btn {
+        display: inline-flex; align-items: center; gap: 9px;
+        font-family: "IBM Plex Mono"; font-size: 14px; font-weight: 500;
+        color: var(--paper); background: var(--teal); border: 1px solid var(--teal);
+        padding: 12px 22px; border-radius: var(--radius); box-shadow: var(--shadow);
+        cursor: pointer; transition: background 0.15s, transform 0.08s, opacity 0.15s;
+      }
+      .btn:hover:not(:disabled) { background: var(--teal-deep); border-color: var(--teal-deep); }
+      .btn:active:not(:disabled) { transform: translateY(1px); }
+      .btn:disabled { opacity: 0.42; cursor: not-allowed; }
+      .btn.ghost { color: var(--ink-soft); background: transparent; border-color: var(--line-strong); }
+      .btn.ghost:hover:not(:disabled) { background: #fff; color: var(--ink); border-color: var(--ink); }
+
+      /* ---------- results ---------- */
+      .results { display: none; scroll-margin-top: 20px; }
+      .results.show { display: block; }
+
+      .verdict {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: clamp(20px, 3vw, 30px);
+      }
+      .verdict-top {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: clamp(20px, 4vw, 42px);
+        align-items: center;
+      }
+      @media (max-width: 620px) { .verdict-top { grid-template-columns: 1fr; gap: 18px; } }
+      .scorebadge { text-align: center; }
+      .scorebadge .big {
+        font-family: "IBM Plex Mono"; font-weight: 600;
+        font-size: clamp(52px, 10vw, 74px);
+        line-height: 0.9; letter-spacing: -0.02em;
+      }
+      .scorebadge .of { font-family: "IBM Plex Mono"; font-size: 12px; color: var(--ink-faint); margin-top: 6px; }
+      .scorebadge .cat {
+        font-family: "Fraunces"; font-weight: 600;
+        font-size: clamp(19px, 2.6vw, 25px);
+        margin-top: 12px;
+        padding: 3px 14px; border-radius: 999px; display: inline-block;
+      }
+      .cat.conservative { color: var(--blue); background: rgba(59,108,140,0.10); }
+      .cat.moderate { color: var(--amber); background: rgba(185,130,43,0.12); }
+      .cat.aggressive { color: var(--rust); background: rgba(176,71,43,0.10); }
+      .verdict-read { font-size: 15px; color: var(--ink-soft); line-height: 1.62; }
+      .verdict-read b { color: var(--ink); font-weight: 500; }
+
+      /* ---------- dual scale ---------- */
+      .dualscale { margin-top: clamp(22px, 3vw, 30px); }
+      .ds-caption { font-family: "IBM Plex Mono"; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 14px; }
+      .track-wrap { position: relative; padding: 44px 4px 26px; }
+      .track {
+        position: relative;
+        height: 16px;
+        border-radius: 3px;
+        display: flex;
+        overflow: hidden;
+        border: 1px solid var(--line-strong);
+      }
+      .zone { height: 100%; display: flex; align-items: center; justify-content: center; }
+      .zone.z-con { background: rgba(59,108,140,0.22); }
+      .zone.z-mod { background: rgba(185,130,43,0.26); }
+      .zone.z-agg { background: rgba(176,71,43,0.24); }
+      .zone-lab {
+        position: absolute; top: 68px; transform: translateX(-50%);
+        font-family: "IBM Plex Mono"; font-size: 10.5px; color: var(--ink-faint);
+        white-space: nowrap;
+      }
+      .marker {
+        position: absolute; top: 38px;
+        width: 2px; height: 30px; background: var(--ink);
+        transform: translateX(-50%);
+        transition: left 0.5s cubic-bezier(0.2,0.7,0.2,1);
+      }
+      .marker::before {
+        content: ""; position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
+        border-left: 6px solid transparent; border-right: 6px solid transparent;
+        border-top: 8px solid var(--ink);
+      }
+      .marker .mval {
+        position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
+        font-family: "IBM Plex Mono"; font-size: 12px; font-weight: 600; color: var(--ink);
+        background: var(--panel); border: 1px solid var(--line-strong); border-radius: 3px;
+        padding: 1px 6px; white-space: nowrap;
+      }
+      /* ---------- score readout ---------- */
+      .abridge {
+        display: grid; grid-template-columns: minmax(0, 300px);
+        margin-top: clamp(22px, 3vw, 28px);
+      }
+      @media (max-width: 620px) { .abridge { grid-template-columns: 1fr; } }
+      .acard {
+        border: 1px solid var(--line); border-radius: var(--radius);
+        background: var(--panel); box-shadow: var(--shadow);
+        padding: 14px 16px; position: relative; overflow: hidden;
+      }
+      .acard::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--rust); opacity: 0.85; }
+      .acard.c-teal::before { background: var(--teal); }
+      .acard.c-slate::before { background: var(--slate); }
+      .acard .k { font-size: 12px; color: var(--ink-soft); min-height: 2.4em; line-height: 1.35; }
+      .acard .v { font-family: "IBM Plex Mono"; font-weight: 600; font-size: 22px; margin-top: 8px; line-height: 1; }
+      .acard .sv { font-family: "IBM Plex Mono"; font-size: 11px; color: var(--ink-faint); margin-top: 5px; }
+
+      /* ---------- methodology explainer ---------- */
+      .explainer {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: clamp(20px, 3vw, 30px);
+      }
+      .explainer h3 { font-size: clamp(18px, 2.2vw, 22px); margin: 0 0 4px; font-weight: 600; }
+      .explainer .sub { font-family: "IBM Plex Mono"; font-size: 12px; color: var(--ink-faint); margin-bottom: 18px; }
+      .exp-block { margin-bottom: 20px; }
+      .exp-block:last-child { margin-bottom: 0; }
+      .exp-block h4 { font-family: "Fraunces"; font-size: 16px; font-weight: 600; margin: 0 0 7px; }
+      .exp-block p { margin: 0 0 8px; color: var(--ink-soft); font-size: 14px; line-height: 1.6; max-width: 82ch; }
+      .exp-block p:last-child { margin-bottom: 0; }
+      .eq {
+        font-family: "IBM Plex Mono"; font-size: 13px; color: var(--teal-deep);
+        background: rgba(14, 124, 102, 0.06); padding: 2px 7px; border-radius: 3px;
+      }
+      .maptable { width: 100%; border-collapse: collapse; font-family: "IBM Plex Mono"; font-size: 12.5px; margin-top: 10px; }
+      .maptable th, .maptable td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); }
+      .maptable th { color: var(--ink-faint); font-weight: 500; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+      .maptable td { color: var(--ink-soft); }
+      .maptable .b-con td:first-child { color: var(--blue); }
+      .maptable .b-mod td:first-child { color: var(--amber); }
+      .maptable .b-agg td:first-child { color: var(--rust); }
+      .maptable td:first-child { font-weight: 600; }
+
+      /* ---------- footer ---------- */
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 44px;
+        padding: 22px clamp(20px, 5vw, 40px);
+        max-width: 940px; margin-left: auto; margin-right: auto;
+        color: var(--ink-faint);
+        font-family: "IBM Plex Mono"; font-size: 11.5px;
+        display: flex; flex-wrap: wrap; gap: 8px 20px; justify-content: space-between;
+      }
+
+      @media (prefers-reduced-motion: no-preference) {
+        .qcard, .verdict, .explainer { animation: rise 0.45s cubic-bezier(0.2,0.7,0.2,1) both; }
+        @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+      }
+      ::-webkit-scrollbar { width: 10px; height: 10px; }
+      ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 6px; border: 2px solid var(--panel); }
+      html, body { overflow-x: hidden; max-width: 100%; }
+    </style>
+  </head>
+  <body>
+    <header class="masthead">
+      <div class="eyebrow">Financial Economics · Week 2</div>
+      <h1>What's Your <em>Risk Tolerance?</em></h1>
+      <p class="lede">
+        The risk-tolerance questionnaire from Bodie, Kane &amp; Marcus (<em>Investments</em>, Ch.&nbsp;6).
+        Answer each item as yourself; the tool tallies your risk-<em>tolerance</em> score on the
+        9–27 scale and places you in a category — Conservative, Moderate, or Aggressive.
+      </p>
+    </header>
+
+    <main>
+      <div class="sectlabel">The questionnaire</div>
+      <form id="quiz" autocomplete="off"></form>
+
+      <div class="computebar">
+        <span class="progress"><b id="answered">0</b> / 9 answered</span>
+        <button type="button" class="btn" id="scoreBtn" disabled>Score my risk tolerance →</button>
+        <button type="button" class="btn ghost" id="resetBtn">Reset</button>
+      </div>
+
+      <section class="results" id="results" aria-live="polite">
+        <div class="sectlabel">Your result</div>
+        <div class="verdict">
+          <div class="verdict-top">
+            <div class="scorebadge">
+              <div class="big mono" id="scoreVal">—</div>
+              <div class="of">points · scale 9–27</div>
+              <div class="cat" id="catVal">—</div>
+            </div>
+            <div class="verdict-read" id="readOut"></div>
+          </div>
+
+          <div class="dualscale">
+            <div class="ds-caption">Where your score falls · tolerance rises →</div>
+            <div class="track-wrap">
+              <div class="track">
+                <div class="zone z-con" id="zCon"></div>
+                <div class="zone z-mod" id="zMod"></div>
+                <div class="zone z-agg" id="zAgg"></div>
+              </div>
+              <div class="zone-lab" id="labCon">Conservative</div>
+              <div class="zone-lab" id="labMod">Moderate</div>
+              <div class="zone-lab" id="labAgg">Aggressive</div>
+              <div class="marker" id="marker"><span class="mval" id="markerVal">—</span></div>
+            </div>
+          </div>
+
+          <div class="abridge">
+            <div class="acard c-teal">
+              <div class="k">Risk-tolerance score</div>
+              <div class="v" id="bScore">—</div>
+              <div class="sv">higher = more tolerant</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="sectlabel">How the score is built</div>
+      <div class="explainer">
+        <h3>Scoring methodology</h3>
+        <div class="sub">Bodie–Kane–Marcus, Investments 5e, Ch. 6</div>
+
+        <div class="exp-block">
+          <h4>The tally</h4>
+          <p>
+            Each answer is weighted by its letter: <span class="eq">a → 1</span>,
+            <span class="eq">b → 2</span>, <span class="eq">c → 3</span>. Your score is the plain sum across all
+            scored items. Because the item ladders from the safest choice (a) to the most risk-seeking (c), the
+            total is monotone in risk tolerance.
+          </p>
+        </div>
+
+        <div class="exp-block">
+          <h4>Why nine items, not seven</h4>
+          <p>
+            Question 2 re-poses the 20%-loss scenario across three time horizons — five, fifteen, and thirty years
+            (items 2A, 2B, 2C) — and each is scored separately. That gives <b>9 scored items</b>: Q1, 2A, 2B, 2C,
+            Q3, Q4, Q5, Q6, Q7. The all-<em>a</em> floor is <span class="eq">9 × 1 = 9</span> and the all-<em>c</em>
+            ceiling is <span class="eq">9 × 3 = 27</span>, which is exactly why the published bands run from 9 to 27.
+          </p>
+          <table class="maptable">
+            <thead><tr><th>Score band</th><th>Category</th><th>Interpretation</th></tr></thead>
+            <tbody>
+              <tr class="b-con"><td>9 – 14</td><td>Conservative</td><td>penalizes risk heavily; prefers principal safety</td></tr>
+              <tr class="b-mod"><td>15 – 21</td><td>Moderate</td><td>the "middle-of-the-road" majority</td></tr>
+              <tr class="b-agg"><td>22 – 27</td><td>Aggressive</td><td>accepts large variance for upside</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </main>
+
+    <footer>
+      <span>Financial Economics · Week 2 — risk tolerance</span>
+      <span>Questionnaire from Bodie–Kane–Marcus, Investments, Ch. 6. Teaching use only — not advice.</span>
+    </footer>
+
+    <script>
+      // ---- questionnaire data (verbatim from the source) ----
+      const QUESTIONS = [
+        {
+          id: "q1", n: "1",
+          text: "Just 60 days after you put money into an investment, its price falls 20%. Assuming none of the fundamentals have changed, what would you do?",
+          opts: [
+            "Sell to avoid further worry and try something else",
+            "Do nothing and wait for the investment to come back",
+            "Buy more. It was a good investment before; now it's a cheap investment, too",
+          ],
+        },
+        {
+          id: "q2a", n: "2A",
+          groupIntro: "Now look at the previous question another way. Your investment fell 20%, but it's part of a portfolio being used to meet investment goals with <b>three different time horizons.</b>",
+          text: "What would you do if the goal were <b>five years</b> away?",
+          opts: ["Sell", "Do nothing", "Buy more"],
+        },
+        { id: "q2b", n: "2B", text: "What would you do if the goal were <b>15 years</b> away?", opts: ["Sell", "Do nothing", "Buy more"] },
+        { id: "q2c", n: "2C", text: "What would you do if the goal were <b>30 years</b> away?", opts: ["Sell", "Do nothing", "Buy more"] },
+        {
+          id: "q3", n: "3",
+          text: "The price of your retirement investment jumps 25% a month after you buy it. Again, the fundamentals haven't changed. After you finish gloating, what do you do?",
+          opts: [
+            "Sell it and lock in your gains",
+            "Stay put and hope for more gain",
+            "Buy more; it could go higher",
+          ],
+        },
+        {
+          id: "q4", n: "4",
+          text: "You're investing for retirement, which is 15 years away. Which would you rather do?",
+          opts: [
+            "Invest in a money-market fund or guaranteed investment contract, giving up the possibility of major gains, but virtually assuring the safety of your principal",
+            "Invest in a 50-50 mix of bond funds and stock funds, in hopes of getting some growth, but also giving yourself some protection in the form of steady income",
+            "Invest in aggressive growth mutual funds whose value will probably fluctuate significantly during the year, but have the potential for impressive gains over five or 10 years",
+          ],
+        },
+        {
+          id: "q5", n: "5",
+          text: "You just won a big prize! But which one? It's up to you.",
+          opts: ["$2,000 in cash", "A 50% chance to win $5,000", "A 20% chance to win $15,000"],
+        },
+        {
+          id: "q6", n: "6",
+          text: "A good investment opportunity just came along. But you have to borrow money to get in. Would you take out a loan?",
+          opts: ["Definitely not", "Perhaps", "Yes"],
+        },
+        {
+          id: "q7", n: "7",
+          text: "Your company is selling stock to its employees. In three years, management plans to take the company public. Until then, you won't be able to sell your shares and you will get no dividends. But your investment could multiply as much as 10 times when the company goes public. How much money would you invest?",
+          opts: ["None", "Two months' salary", "Four months' salary"],
+        },
+      ];
+
+      const TOTAL = QUESTIONS.length; // 9
+      const answers = {}; // id -> 1|2|3
+      const letters = ["a", "b", "c"];
+
+      // ---- render ----
+      const form = document.getElementById("quiz");
+      QUESTIONS.forEach((q) => {
+        if (q.groupIntro) {
+          const intro = document.createElement("div");
+          intro.className = "qgroup-intro";
+          intro.innerHTML = q.groupIntro;
+          form.appendChild(intro);
+        }
+        const card = document.createElement("div");
+        card.className = "qcard";
+        card.id = "card-" + q.id;
+
+        const head = document.createElement("div");
+        head.className = "qhead";
+        head.innerHTML = '<span class="qnum">' + q.n + '</span><span class="qtext">' + q.text + "</span>";
+        card.appendChild(head);
+
+        const opts = document.createElement("div");
+        opts.className = "opts";
+        q.opts.forEach((text, i) => {
+          const val = i + 1;
+          const opt = document.createElement("div");
+          opt.className = "opt";
+          opt.tabIndex = 0;
+          opt.setAttribute("role", "radio");
+          opt.setAttribute("aria-checked", "false");
+          opt.dataset.q = q.id;
+          opt.dataset.val = val;
+          opt.innerHTML =
+            '<span class="mark">' + letters[i] + '</span><span class="lbl">' + text + "</span>";
+          const choose = () => select(q.id, val, card);
+          opt.addEventListener("click", choose);
+          opt.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); choose(); }
+          });
+          opts.appendChild(opt);
+        });
+        card.appendChild(opts);
+        form.appendChild(card);
+      });
+
+      function select(qid, val, card) {
+        answers[qid] = val;
+        card.querySelectorAll(".opt").forEach((o) => {
+          const on = Number(o.dataset.val) === val;
+          o.classList.toggle("sel", on);
+          o.setAttribute("aria-checked", on ? "true" : "false");
+        });
+        card.classList.add("answered");
+        updateProgress();
+      }
+
+      const answeredEl = document.getElementById("answered");
+      const scoreBtn = document.getElementById("scoreBtn");
+      function updateProgress() {
+        const n = Object.keys(answers).length;
+        answeredEl.textContent = n;
+        scoreBtn.disabled = n < TOTAL;
+      }
+
+      function category(S) {
+        if (S <= 14) return { key: "conservative", label: "Conservative" };
+        if (S <= 21) return { key: "moderate", label: "Moderate" };
+        return { key: "aggressive", label: "Aggressive" };
+      }
+      // score position on the 9..27 axis as a percentage
+      const scorePct = (S) => ((S - 9) / (27 - 9)) * 100;
+
+      const READ = {
+        conservative:
+          "You penalise volatility heavily and prize principal safety. A sharp drawdown is likely to prompt you to sell, so you lean toward capital-preserving assets and would often accept a lower expected return for a smoother ride.",
+        moderate:
+          "You sit in the middle-of-the-road majority. You accept some volatility in exchange for a reasonable premium, but you want meaningful downside protection — a balanced stock/bond posture is your natural home.",
+        aggressive:
+          "You are willing to carry large swings in value for the sake of upside. You tend to hold, or even add, through drawdowns and tilt toward equities, tolerating deep interim losses in pursuit of long-run growth.",
+      };
+
+      // ---- compute + render results ----
+      const results = document.getElementById("results");
+      function score() {
+        if (Object.keys(answers).length < TOTAL) return;
+        const S = QUESTIONS.reduce((s, q) => s + answers[q.id], 0);
+        const cat = category(S);
+
+        document.getElementById("scoreVal").textContent = S;
+        const catEl = document.getElementById("catVal");
+        catEl.textContent = cat.label;
+        catEl.className = "cat " + cat.key;
+
+        document.getElementById("readOut").innerHTML = READ[cat.key];
+        document.getElementById("bScore").textContent = S + " / 27";
+
+        // tolerance spectrum
+        const pct = scorePct(S);
+        // zone widths (boundaries at 14.5 and 21.5 on the 9..27 axis)
+        const wCon = ((14.5 - 9) / 18) * 100;
+        const wMod = ((21.5 - 14.5) / 18) * 100;
+        const wAgg = 100 - wCon - wMod;
+        document.getElementById("zCon").style.width = wCon + "%";
+        document.getElementById("zMod").style.width = wMod + "%";
+        document.getElementById("zAgg").style.width = wAgg + "%";
+        document.getElementById("labCon").style.left = wCon / 2 + "%";
+        document.getElementById("labMod").style.left = wCon + wMod / 2 + "%";
+        document.getElementById("labAgg").style.left = wCon + wMod + wAgg / 2 + "%";
+
+        const marker = document.getElementById("marker");
+        marker.style.left = pct + "%";
+        document.getElementById("markerVal").textContent = "score " + S;
+
+        results.classList.add("show");
+        results.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      scoreBtn.addEventListener("click", score);
+      document.getElementById("resetBtn").addEventListener("click", () => {
+        for (const k in answers) delete answers[k];
+        document.querySelectorAll(".opt").forEach((o) => {
+          o.classList.remove("sel");
+          o.setAttribute("aria-checked", "false");
+        });
+        document.querySelectorAll(".qcard").forEach((c) => c.classList.remove("answered"));
+        results.classList.remove("show");
+        updateProgress();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    </script>
+  </body>
+</html>
