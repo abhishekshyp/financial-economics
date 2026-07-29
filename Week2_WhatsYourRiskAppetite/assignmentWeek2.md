@@ -55,7 +55,7 @@ The reference vector deliberately puts ~half the weight on human capital, income
 
 **Answer these (keep it tight):**
 - Justify your weights and your three cut-offs. Anchor at least one choice in a reading.
-- Run one profile through it end-to-end (yourself, anonymised, or a persona) and report the score and label. Does the label pass the smell test?
+- Run one profile through it end-to-end (yourself, anonymised, or a persona) and report the score and label.
 - Compare your label to what the questionnaire and the person's actual risky share would say. Where they disagree, which should win?
 
 ---
