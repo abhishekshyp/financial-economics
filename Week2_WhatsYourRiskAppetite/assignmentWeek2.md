@@ -18,7 +18,7 @@ The assignment has two tasks.
 
 You are handed **$25** and told a coin is biased **60% heads / 40% tails**. You may bet any amount on heads *or* tails, on each of ~300 flips in 30 minutes, and you keep your ending balance up to a **$250 cap** (ten times the stake). A positive-expected-value game, handed to you on a plate.
 
-The uncomfortable result from the original experiment (61 finance students and young professionals): only **21% reached the cap**, a **third finished below their starting $25**, and **28% went bust** — on a coin they *knew* was favourable.
+The uncomfortable result from the original experiment: only **21% reached the cap**, a **third finished below their starting $25**, and **28% went bust** — on a coin they *knew* was favourable.
 
 **The link to this week.** The coin's return/risk ratio (~0.20) is close to what many expect from equities. Bet sizing *is* the risky-asset allocation decision. Kelly gives the growth-optimal share; a risk-averse investor rationally holds a *fraction* of Kelly. That fraction is what Task 2 tries to pin down from a person's balance sheet.
 
