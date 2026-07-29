@@ -62,21 +62,8 @@ The reference vector deliberately puts ~half the weight on human capital, income
 
 ## What to submit
 
-1. **Task 1** — the official downloaded coin-flip result (target: the $250 cap) + your reflection paragraph.
-2. **Task 2** — your weights, your scoring, your cut-offs, and one worked profile with its label. A short page or a small Excel/Python sheet is enough. **State every assumption.**
-
----
-
-## Grading rubric
-
-| Criterion | Weight |
-|---|---|
-| Task 1 — result submitted + honest reflection linking play to Kelly / a named bias | 20% |
-| **Weights — defended with economic reasoning + a cited source** | 40% |
-| Scoring and Aggressive/Moderate/Conservative cut-offs — sensible and justified | 25% |
-| One worked profile that passes the smell test; assumptions stated | 15% |
-
-Top-3 bonus for the optional reconciliation against the questionnaire and revealed risky share.
+1. **Task 1** — the official downloaded coin-flip result (target: the $250 cap).
+2. **Task 2** — your weights, your scoring, your cut-offs, and one worked profile with its label. A small Excel/Python sheet is enough. **State every assumption.**
 
 ---
 
