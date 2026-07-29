@@ -30,16 +30,17 @@ The uncomfortable result from the original experiment (61 finance students and y
 ---
 
 ## Task 2 · Build your personal risk score
- 
+
 In class we scored risk two ways: the **questionnaire** (what a person *says*) and **revealed preference** (what they *hold* in risky assets). Both miss a third thing — what a person can objectively *afford* to risk. Build a score for that from these inputs, and use it to label them **Aggressive / Moderate / Conservative**:
- 
+
 `age · salary · industry · liabilities · assets (risky vs risk-free) · human capital · dependents · consumption rate`
- 
+
 **The hint — the whole method is three moves:**
- 
+
 1. **Assign weights out of 100** across the eight buckets (they must sum to 100). This is the graded part — *defend* each weight with economic reasoning, not taste. Use the table below as a reference direction for each bucket.
 2. **Score and combine.** Rate each bucket 0–100 for how much it *supports* risk-taking (100 = most), then take the weighted average → a single 0–100 risk score.
 3. **Label the output.** Map the score to a band — e.g. **0–40 Conservative, 40–70 Moderate, 70–100 Aggressive**. Pick and justify your own cut-offs.
+
 | Bucket | Higher risk-taking capacity when… | Reference weight (/100) |
 |---|---|---|
 | Human capital | large & stable relative to financial wealth (implicit safe asset) | 20 |
@@ -49,30 +50,32 @@ In class we scored risk two ways: the **questionnaire** (what a person *says*) a
 | Liabilities / leverage | little fixed debt to service | 15 |
 | Savings rate | high (low consumption rate → replenishable) | 10 |
 | Dependents | few committed mouths to feed | 10 |
- 
+
 The reference vector deliberately puts ~half the weight on human capital, income stability, and leverage — the three things that decide whether a person can survive a drawdown *without being forced to sell at the bottom*. Beat it or depart from it, but say why.
- 
+
 **Answer these (keep it tight):**
 - Justify your weights and your three cut-offs. Anchor at least one choice in a reading.
 - Run one profile through it end-to-end (yourself, anonymised, or a persona) and report the score and label. Does the label pass the smell test?
 - Compare your label to what the questionnaire and the person's actual risky share would say. Where they disagree, which should win?
+
 ---
- 
+
 ## What to submit
- 
+
 1. **Task 1** — the official downloaded coin-flip result (target: the $250 cap) + your reflection paragraph.
 2. **Task 2** — your weights, your scoring, your cut-offs, and one worked profile with its label. A short page or a small Excel/Python sheet is enough. **State every assumption.**
+
 ---
- 
+
 ## Grading rubric
- 
+
 | Criterion | Weight |
 |---|---|
 | Task 1 — result submitted + honest reflection linking play to Kelly / a named bias | 20% |
 | **Weights — defended with economic reasoning + a cited source** | 40% |
 | Scoring and Aggressive/Moderate/Conservative cut-offs — sensible and justified | 25% |
 | One worked profile that passes the smell test; assumptions stated | 15% |
- 
+
 Top-3 bonus for the optional reconciliation against the questionnaire and revealed risky share.
 
 ---
