@@ -7,10 +7,11 @@
 
 ## The brief
 
-The assignment has two tasks.
-
+The assignment has three tasks.
+ 
 - **Task 1 — Play & read.** Read the ELM write-up on betting a biased coin, play the game, and bring your official downloaded result.
 - **Task 2 — Build your personal risk score.** Turn objective inputs (age, salary, industry, liabilities, assets, human capital, dependents, consumption rate) into a defensible risk-capacity score, then reconcile it against the questionnaire and revealed-preference methods from the lecture.
+- **Task 3 — The concentration case study.** Work through a sector shock that hits your salary and your ESOPs at once, and decide what to do about it.
 
 ---
 
