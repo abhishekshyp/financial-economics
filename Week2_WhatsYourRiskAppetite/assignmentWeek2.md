@@ -21,7 +21,7 @@ You are handed **$25** and told a coin is biased **60% heads / 40% tails**. You 
 
 The uncomfortable result from the original experiment: only **21% reached the cap**, a **third finished below their starting $25**, and **28% went bust** — on a coin they *knew* was favourable.
 
-**The link to this week.** The coin's return/risk ratio (~0.20) is close to what many expect from equities. Bet sizing *is* the risky-asset allocation decision. Kelly gives the growth-optimal share; a risk-averse investor rationally holds a *fraction* of Kelly. That fraction is what Task 2 tries to pin down from a person's balance sheet.
+**The link to this week.** The coin's return/risk ratio (~0.20) is close to what many expect from equities. Bet sizing *is* the risky-asset allocation decision. Kelly gives the growth-optimal share; a risk-averse investor rationally holds a *fraction* of Kelly. That fraction is what Task 2 tries to pin down from a person's net worth.
 
 **Do this:**
 - Read the write-up: https://elmwealth.com/lessons-from-betting-on-a-biased-coin-cool-heads-and-cautionary-tales/
@@ -43,7 +43,7 @@ In class we scored risk two ways: the **questionnaire** (what a person *says*) a
 3. **Label the output.** Map the score to a band — e.g. **0–40 Conservative, 40–70 Moderate, 70–100 Aggressive**. Pick and justify your own cut-offs.
 
 **Answer these (keep it tight):**
-- Justify your weights and your three cut-offs. Anchor at least one choice in a reading.
+- Justify your weights and your three cut-offs.
 - Run one profile through it end-to-end (yourself, anonymised, or a persona) and report the score and label.
 - Compare your label to what the questionnaire and the person's actual risky share would say. Where they disagree, which should win?
 
@@ -59,16 +59,12 @@ Then the sector turns. A shock hits: your **salary falls by x%** (bonus cut, the
  
 **Work through this — three moves:**
  
-1. **Size the joint loss on your total balance sheet.** Estimate your wealth *including human capital*: `Human capital H` = PV of your remaining salary (a rough `salary × annuity factor` is fine), plus `ESOPs`, plus any diversified financial assets and cash. State your assumptions (salary, growth g, discount rate r, years to 65). Now apply the shock and report the loss in **rupees/dollars and as a % of total wealth** — not just the % on each piece. The number is larger than students expect, because human capital is the biggest line and it is 100% in this sector.
+1. **Size the joint loss on your total net worth.** Estimate your wealth *including human capital*: `Human capital H` = PV of your remaining salary (a rough `salary × annuity factor` is fine), plus `ESOPs`, plus any diversified financial assets and cash. State your assumptions (salary, growth g, discount rate r, years to 65). Now apply the shock and report the loss in **rupees/dollars and as a % of total wealth**.
 2. **Calculate the correlation.** One shock is one data point — you cannot get a correlation from it. So build a small **sector-scenario table** (say: boom / normal / mild downturn / crash), and in each state write your salary growth and your ESOP return; the crash row is your (x%, y%) shock. Then compute
    `ρ = Cov(Δsalary, ΔESOP) / (σ_salary · σ_ESOP)`
    across the states. Report ρ and explain *why* it comes out where it does. (It will sit near **+1** — both are driven by the same sector factor. That is the finding, not an accident.)
-3. **Write your forward plan — assuming you must stay in this sector.** You love the work; quitting is not the answer. So the fix has to come from the *financial* side of the balance sheet. In one tight paragraph, say what you will do differently — e.g. sell and reinvest ESOPs as they vest rather than letting them ride, keep your fund portfolio *underweight* your own sector (hedge the paycheck instead of doubling it), hold a larger uncorrelated buffer given that a sector shock threatens income and savings at once. Tie each move back to ρ: the higher your income-to-portfolio correlation, the harder your financial capital must lean the other way.
-**The question that decides the grade.** Human capital shrinks toward zero as you approach retirement, while financial capital accumulates; suppose they **cross at age 45**. Does the concentration problem *solve itself* at that crossover? Model H(age) and F(age) over time, mark the crossover, and argue it out:
- 
-- The human-capital piece of the risk self-liquidates with age (a shock to 15 remaining years hurts far less in PV than to 38). So the problem *attenuates* mechanically — true.
-- But if the accumulating financial capital is still full of vested ESOPs and sector funds, the crossover merely **moves the concentration from the human-capital envelope into the financial one** — same factor, new wrapper. It resolves only if F is deliberately diversified *away* from the sector as it grows.
-- And you are most exposed *before* 45 — exactly when you can least afford to wait for the crossover to save you. What does that imply about acting now versus later?
+3. **Write your forward plan — assuming you must stay in this sector.** You love the work; quitting is not the answer. So the fix has to come from the *financial* side of the net worth. In one tight paragraph, say what you will do differently — e.g. sell and reinvest ESOPs as they vest rather than letting them ride, keep your fund portfolio *underweight* your own sector (hedge the paycheck instead of doubling it), hold a larger uncorrelated buffer given that a sector shock threatens income and savings at once. Tie each move back to ρ: the higher your income-to-portfolio correlation, the harder your financial capital must lean the other way.
+Human capital shrinks toward zero as you approach retirement, while financial capital accumulates; suppose they **cross at age 45**. Does the concentration problem *solve itself* at that crossover?
 
 ---
 
@@ -76,7 +72,7 @@ Then the sector turns. A shock hits: your **salary falls by x%** (bonus cut, the
 
 1. **Task 1** — the official downloaded coin-flip result (target: the $250 cap).
 2. **Task 2** — your weights, your scoring, your cut-offs, and one worked profile with its label. A small Excel/Python sheet is enough. **State every assumption.**
-3. **Task 3** — your chosen sector, the total-wealth joint-loss figure, the scenario table with the computed ρ, your one-paragraph forward plan, and the H-vs-F crossover chart with your answer to the crossover question.
+3. **Task 3** — your chosen sector, the total-wealth figure, the scenario table with the computed ρ, your one-paragraph forward plan, and the H-vs-F crossover question.
 
 ---
 
@@ -99,6 +95,12 @@ Then the sector turns. A shock hits: your **salary falls by x%** (bonus cut, the
 - Benartzi, S. (2001). *Excessive Extrapolation and the Allocation of 401(k) Accounts to Company Stock.* — the employer-stock trap, exactly this case.
 - Davis, S. J., & Willen, P. (2000). *Occupation-Level Income Shocks and Asset Returns.* — why your portfolio should hedge, not amplify, your career risk.
 - Statman, M. (2004). *The Diversification Puzzle.* — how much diversification is enough, and why people hold too little.
+
+---
+
+# Grading
+
+This is a **completion grade — 2 marks for submitting.** All three tasks in, and the marks are yours; there's no quality scoring.
 
 ---
 
