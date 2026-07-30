@@ -41,18 +41,6 @@ In class we scored risk two ways: the **questionnaire** (what a person *says*) a
 2. **Score and combine.** Rate each bucket 0–100 for how much it *supports* risk-taking (100 = most), then take the weighted average → a single 0–100 risk score.
 3. **Label the output.** Map the score to a band — e.g. **0–40 Conservative, 40–70 Moderate, 70–100 Aggressive**. Pick and justify your own cut-offs.
 
-| Bucket | Higher risk-taking capacity when… | Reference weight (/100) |
-|---|---|---|
-| Human capital | large & stable relative to financial wealth (implicit safe asset) | 20 |
-| Age / horizon | younger — more time to recover | 15 |
-| Industry stability | income uncorrelated with markets (govt > cyclical > finance/founder) | 15 |
-| Net-worth buffer | assets cover many years of spending | 15 |
-| Liabilities / leverage | little fixed debt to service | 15 |
-| Savings rate | high (low consumption rate → replenishable) | 10 |
-| Dependents | few committed mouths to feed | 10 |
-
-The reference vector deliberately puts ~half the weight on human capital, income stability, and leverage — the three things that decide whether a person can survive a drawdown *without being forced to sell at the bottom*. Beat it or depart from it, but say why.
-
 **Answer these (keep it tight):**
 - Justify your weights and your three cut-offs. Anchor at least one choice in a reading.
 - Run one profile through it end-to-end (yourself, anonymised, or a persona) and report the score and label.
