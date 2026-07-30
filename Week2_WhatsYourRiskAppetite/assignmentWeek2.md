@@ -100,11 +100,9 @@ Human capital shrinks toward zero as you approach retirement, while financial ca
 
 ---
 
-# Grading
+## Grading
 
 This is a **completion grade — 2 marks for submitting.** All three tasks in, and the marks are yours; there's no quality scoring.
-
----
 
 ## Submission
 
