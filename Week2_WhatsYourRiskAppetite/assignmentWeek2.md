@@ -81,6 +81,7 @@ Human capital shrinks toward zero as you approach retirement, while financial ca
 **Play & read (Task 1)**
 - Haghani, V., & Dewey, R. (2016). *Lessons from Betting on a Biased Coin: Cool Heads and Cautionary Tales.* Elm Wealth.
 - Haghani, V., & White, J. (2023). *The Missing Billionaires.* Wiley. — bet-sizing and expected-utility as the missing half of finance education.
+
 **Build the score (Task 2)**
 - Bodie, Kane & Marcus, *Investments* — **Ch. 6** (Capital Allocation to Risky Assets; the `y* = (E[r]−r_f)/(A σ²)` rule) and **Ch. 28** (investor life cycle, human capital, tolerance vs capacity).
 - Merton, R. C. (1969). *Lifetime Portfolio Selection under Uncertainty.* — `w* = (μ−r_f)/(γσ²)`.
@@ -89,6 +90,7 @@ Human capital shrinks toward zero as you approach retirement, while financial ca
 - Grable, J., & Lytton, R. (1999). *Financial Risk Tolerance Revisited.* — the questionnaire lineage (Method 1).
 - Barsky, Juster, Kimball & Shapiro (1997). *Preference Parameters and Behavioral Heterogeneity.* — plausible ranges for γ.
 - Kahneman, D., & Tversky, A. (1979). *Prospect Theory.* — the caveat: stated and revealed risk attitudes are reference-dependent and unstable.
+
 **The concentration case study (Task 3)**
 - Markowitz, H. (1952). *Portfolio Selection.* Journal of Finance. — diversification as the only free lunch; correlation is the lever.
 - Bodie, Kane & Marcus, *Investments* — **Ch. 7** (Optimal Risky Portfolios; how variance falls with n and the systematic-risk floor).
