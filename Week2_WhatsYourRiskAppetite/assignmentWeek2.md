@@ -48,19 +48,42 @@ In class we scored risk two ways: the **questionnaire** (what a person *says*) a
 
 ---
 
+## Task 3 · The concentration case study
+ 
+**The setup.** Pick the one sector you'd most like to work in — **your** sector (tech, banking, pharma, energy, autos, whatever pulls you). Now live in it:
+ 
+> You are 27, single, no debt. On the risk score from Task 2 you land firmly **Aggressive** — long horizon, no dependents, high capacity to take risk. You draw a good salary from a firm in this sector, and a chunk of your pay is **ESOPs** in that same firm. Life is good, and the standard advice — "you're young, own equities, take risk" — feels right.
+ 
+Then the sector turns. A shock hits: your **salary falls by x%** (bonus cut, then a pay freeze, then layoff risk) and, in the same quarter, your **ESOP value falls by y%**. Pick your own x and y, or use **x = 25%, y = 60%** as the base case. Both hits land together — because they are the same bet.
+ 
+**Work through this — three moves:**
+ 
+1. **Size the joint loss on your total balance sheet.** Estimate your wealth *including human capital*: `Human capital H` = PV of your remaining salary (a rough `salary × annuity factor` is fine), plus `ESOPs`, plus any diversified financial assets and cash. State your assumptions (salary, growth g, discount rate r, years to 65). Now apply the shock and report the loss in **rupees/dollars and as a % of total wealth** — not just the % on each piece. The number is larger than students expect, because human capital is the biggest line and it is 100% in this sector.
+2. **Calculate the correlation.** One shock is one data point — you cannot get a correlation from it. So build a small **sector-scenario table** (say: boom / normal / mild downturn / crash), and in each state write your salary growth and your ESOP return; the crash row is your (x%, y%) shock. Then compute
+   `ρ = Cov(Δsalary, ΔESOP) / (σ_salary · σ_ESOP)`
+   across the states. Report ρ and explain *why* it comes out where it does. (It will sit near **+1** — both are driven by the same sector factor. That is the finding, not an accident.)
+3. **Write your forward plan — assuming you must stay in this sector.** You love the work; quitting is not the answer. So the fix has to come from the *financial* side of the balance sheet. In one tight paragraph, say what you will do differently — e.g. sell and reinvest ESOPs as they vest rather than letting them ride, keep your fund portfolio *underweight* your own sector (hedge the paycheck instead of doubling it), hold a larger uncorrelated buffer given that a sector shock threatens income and savings at once. Tie each move back to ρ: the higher your income-to-portfolio correlation, the harder your financial capital must lean the other way.
+**The question that decides the grade.** Human capital shrinks toward zero as you approach retirement, while financial capital accumulates; suppose they **cross at age 45**. Does the concentration problem *solve itself* at that crossover? Model H(age) and F(age) over time, mark the crossover, and argue it out:
+ 
+- The human-capital piece of the risk self-liquidates with age (a shock to 15 remaining years hurts far less in PV than to 38). So the problem *attenuates* mechanically — true.
+- But if the accumulating financial capital is still full of vested ESOPs and sector funds, the crossover merely **moves the concentration from the human-capital envelope into the financial one** — same factor, new wrapper. It resolves only if F is deliberately diversified *away* from the sector as it grows.
+- And you are most exposed *before* 45 — exactly when you can least afford to wait for the crossover to save you. What does that imply about acting now versus later?
+
+---
+
 ## What to submit
 
 1. **Task 1** — the official downloaded coin-flip result (target: the $250 cap).
 2. **Task 2** — your weights, your scoring, your cut-offs, and one worked profile with its label. A small Excel/Python sheet is enough. **State every assumption.**
+3. **Task 3** — your chosen sector, the total-wealth joint-loss figure, the scenario table with the computed ρ, your one-paragraph forward plan, and the H-vs-F crossover chart with your answer to the crossover question.
 
 ---
 
 ## Readings & references
-
+ 
 **Play & read (Task 1)**
 - Haghani, V., & Dewey, R. (2016). *Lessons from Betting on a Biased Coin: Cool Heads and Cautionary Tales.* Elm Wealth.
 - Haghani, V., & White, J. (2023). *The Missing Billionaires.* Wiley. — bet-sizing and expected-utility as the missing half of finance education.
-
 **Build the score (Task 2)**
 - Bodie, Kane & Marcus, *Investments* — **Ch. 6** (Capital Allocation to Risky Assets; the `y* = (E[r]−r_f)/(A σ²)` rule) and **Ch. 28** (investor life cycle, human capital, tolerance vs capacity).
 - Merton, R. C. (1969). *Lifetime Portfolio Selection under Uncertainty.* — `w* = (μ−r_f)/(γσ²)`.
@@ -69,6 +92,12 @@ In class we scored risk two ways: the **questionnaire** (what a person *says*) a
 - Grable, J., & Lytton, R. (1999). *Financial Risk Tolerance Revisited.* — the questionnaire lineage (Method 1).
 - Barsky, Juster, Kimball & Shapiro (1997). *Preference Parameters and Behavioral Heterogeneity.* — plausible ranges for γ.
 - Kahneman, D., & Tversky, A. (1979). *Prospect Theory.* — the caveat: stated and revealed risk attitudes are reference-dependent and unstable.
+**The concentration case study (Task 3)**
+- Markowitz, H. (1952). *Portfolio Selection.* Journal of Finance. — diversification as the only free lunch; correlation is the lever.
+- Bodie, Kane & Marcus, *Investments* — **Ch. 7** (Optimal Risky Portfolios; how variance falls with n and the systematic-risk floor).
+- Benartzi, S. (2001). *Excessive Extrapolation and the Allocation of 401(k) Accounts to Company Stock.* — the employer-stock trap, exactly this case.
+- Davis, S. J., & Willen, P. (2000). *Occupation-Level Income Shocks and Asset Returns.* — why your portfolio should hedge, not amplify, your career risk.
+- Statman, M. (2004). *The Diversification Puzzle.* — how much diversification is enough, and why people hold too little.
 
 ---
 
