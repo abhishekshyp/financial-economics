@@ -110,7 +110,7 @@ This is a **completion grade — 2 marks for submitting.** All three tasks in, a
 
 - **Deadline:** before the next tutorial.
 - **Naming convention:** `RollNumber_FullName.extension` (e.g. `21112001_AbhishekKashyap.ipynb`, `..._RiskScore.xlsx`, `..._Tool.html`). Submit the coin-flip result as `RollNumber_FullName_Coin.pdf` (or the site's native file). For teams, submit one set under the team lead's `RollNumber_FullName` and list all members on page 1.
-- **Upload folder:** _[insert Week 2 Google Drive link — folder closes at the deadline; no late or alternative submissions]_
+- **Upload folder:** https://drive.google.com/drive/folders/1iGKPvFCisDUvshyZjz474NDy_SrkOCTv?usp=sharing
 
 ---
 
