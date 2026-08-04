@@ -1,0 +1,1836 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- ┌───────────────────────────────────────────────────────────────────┐
+         │  FINANCIAL ECONOMICS — SLIDE TEMPLATE                              │
+         │  Canonical chassis for every week's deck.                         │
+         │  To make a new deck: copy this file, edit the TITLE and THANK-YOU │
+         │  slides, then duplicate the "CONTENT SLIDE" block once per slide. │
+         │  Do NOT edit the CORE CHASSIS CSS or the ENGINE script — only add │
+         │  your own rules in the marked "DECK-SPECIFIC STYLES" section and  │
+         │  your own per-slide initializers in the marked initFns section.   │
+         └───────────────────────────────────────────────────────────────────┘ -->
+    <title>Portfolio Builder — The ₹1,00,000 Challenge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;450;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Chart.js is only needed if a slide draws charts; harmless to keep. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+      /* ══════════════════════════════════════════════════════════════════
+         CORE CHASSIS — shared design tokens + primitives (do not edit)
+         ══════════════════════════════════════════════════════════════════ */
+      :root {
+        --paper: #f1f3ef;
+        --panel: #fbfcfa;
+        --ink: #182129;
+        --ink-soft: #4a5760;
+        --ink-faint: #8b979e;
+        --line: #d7dcd4;
+        --line-strong: #c3cabf;
+        --teal: #0e7c66;
+        --teal-deep: #0a5a4a;
+        --amber: #b9822b;
+        --rust: #b0472b;
+        --blue: #3b6c8c;
+        --slate: #6b7a82;
+        --shadow:
+          0 1px 2px rgba(24, 33, 41, 0.05),
+          0 8px 30px -14px rgba(24, 33, 41, 0.18);
+        --radius: 4px;
+        --paper-grid:
+          repeating-linear-gradient(
+            0deg,
+            transparent 0 27px,
+            rgba(24, 33, 41, 0.035) 27px 28px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            transparent 0 27px,
+            rgba(24, 33, 41, 0.035) 27px 28px
+          );
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: "IBM Plex Sans", system-ui, sans-serif;
+        font-weight: 400;
+        /* Base type scale. Week 1 shipped clamp(14px,1.35vw,17px); the +2px
+           bump is the going-forward standard. To revert: clamp(14px,1.35vw,17px). */
+        font-size: clamp(16px, 1.4vw, 19px);
+        line-height: 1.5;
+        letter-spacing: -0.005em;
+        -webkit-font-smoothing: antialiased;
+        overflow: hidden;
+        background-image:
+          linear-gradient(var(--paper), var(--paper)), var(--paper-grid);
+      }
+      .mono {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-feature-settings: "tnum" 1;
+      }
+      h1,
+      h2,
+      h3,
+      .disp {
+        font-family: "Fraunces", Georgia, serif;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      em {
+        font-style: italic;
+        color: var(--teal-deep);
+        font-weight: inherit;
+      }
+      a {
+        color: var(--teal-deep);
+      }
+
+      /* deck shell */
+      .deck {
+        position: fixed;
+        inset: 0;
+      }
+      .slide {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(16px);
+        transition:
+          opacity 0.5s ease,
+          transform 0.5s ease,
+          visibility 0.5s;
+        overflow-y: auto;
+      }
+      .slide.active {
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+      }
+      .inner {
+        max-width: 1160px;
+        margin: 0 auto;
+        min-height: 100%;
+        padding: clamp(30px, 5.5vh, 66px) clamp(22px, 5vw, 74px)
+          clamp(64px, 8vh, 84px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .inner.top {
+        justify-content: flex-start;
+        padding-top: clamp(40px, 7vh, 78px);
+      }
+
+      /* eyebrow */
+      .eyebrow {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: "IBM Plex Mono";
+        font-size: 13px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 10px;
+        margin-bottom: clamp(16px, 3vh, 30px);
+      }
+      .eyebrow .idx {
+        color: var(--ink-faint);
+      }
+
+      /* headings + text */
+      h1.title {
+        font-size: clamp(46px, 8vw, 96px);
+        line-height: 1.02;
+        margin: 0.08em 0;
+      }
+      .title-sub {
+        font-family: "IBM Plex Mono";
+        font-size: clamp(13px, 1.3vw, 16px);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+      }
+      .title-meta {
+        margin-top: clamp(20px, 4vh, 48px);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .title-meta .who {
+        font-family: "Fraunces";
+        font-size: clamp(19px, 2vw, 25px);
+        font-weight: 600;
+      }
+      .title-meta .mail {
+        font-family: "IBM Plex Mono";
+        font-size: clamp(13px, 1.2vw, 15px);
+        color: var(--teal-deep);
+      }
+      .title-course {
+        font-family: "IBM Plex Mono";
+        font-size: clamp(13px, 1.2vw, 15px);
+        color: var(--ink-soft);
+        margin-top: 2px;
+      }
+      .kbd-hint {
+        margin-top: clamp(26px, 5vh, 56px);
+        font-family: "IBM Plex Mono";
+        font-size: 13px;
+        color: var(--ink-faint);
+      }
+      .kbd {
+        border: 1px solid var(--line-strong);
+        border-bottom-width: 2px;
+        border-radius: 4px;
+        padding: 1px 7px;
+        background: #fff;
+        color: var(--ink-soft);
+        margin: 0 1px;
+      }
+      .head {
+        font-size: clamp(27px, 3.7vw, 47px);
+        line-height: 1.1;
+        margin: 0 0 0.4em;
+      }
+      .head.wide {
+        max-width: 20ch;
+      }
+      .head.sm {
+        font-size: clamp(23px, 3vw, 37px);
+      }
+      .body {
+        color: var(--ink-soft);
+        font-size: clamp(15px, 1.45vw, 18px);
+        line-height: 1.55;
+        margin: 0 0 12px;
+        max-width: 62ch;
+      }
+      .body b,
+      .body strong {
+        color: var(--ink);
+      }
+
+      /* callouts */
+      .callout {
+        color: var(--teal-deep);
+        background: rgba(14, 124, 102, 0.07);
+        border: 1px solid rgba(14, 124, 102, 0.25);
+        border-radius: var(--radius);
+        padding: 10px 13px;
+        margin-top: 12px;
+        display: inline-block;
+        font-size: clamp(14px, 1.35vw, 17px);
+      }
+      .callout.warn {
+        color: var(--rust);
+        background: rgba(176, 71, 43, 0.07);
+        border-color: rgba(176, 71, 43, 0.28);
+      }
+      .callout.amber {
+        color: var(--amber);
+        background: rgba(185, 130, 43, 0.08);
+        border-color: rgba(185, 130, 43, 0.3);
+      }
+
+      /* panels + layout */
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: clamp(16px, 2vw, 24px);
+      }
+      .panel.grid {
+        background-image:
+          linear-gradient(var(--panel), var(--panel)),
+          repeating-linear-gradient(
+            0deg,
+            transparent 0 23px,
+            rgba(24, 33, 41, 0.028) 23px 24px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            transparent 0 23px,
+            rgba(24, 33, 41, 0.028) 23px 24px
+          );
+        background-clip: padding-box;
+      }
+      .two {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(18px, 3vw, 44px);
+        align-items: center;
+      }
+      .two.rail {
+        grid-template-columns: 0.92fr 1.08fr;
+      }
+      .two.railL {
+        grid-template-columns: 1.08fr 0.92fr;
+      }
+      @media (max-width: 880px) {
+        .two,
+        .two.rail,
+        .two.railL {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* charts */
+      .chartwrap {
+        position: relative;
+        width: 100%;
+        height: clamp(240px, 40vh, 420px);
+      }
+      .chartwrap.sm {
+        height: clamp(200px, 30vh, 300px);
+      }
+      .chartwrap canvas {
+        max-width: 100% !important;
+      }
+      .chart-h {
+        font-size: clamp(15px, 1.6vw, 19px);
+        font-weight: 600;
+        margin: 0 0 2px;
+      }
+      .chart-cap {
+        font-size: clamp(12px, 1.15vw, 14px);
+        color: var(--ink-soft);
+        margin: 0 0 12px;
+        line-height: 1.45;
+      }
+
+      /* buttons */
+      .btn {
+        font-family: "IBM Plex Mono";
+        font-size: 14px;
+        letter-spacing: 0.01em;
+        border: 1px solid var(--line-strong);
+        background: #fff;
+        color: var(--ink);
+        border-radius: var(--radius);
+        padding: 10px 17px;
+        cursor: pointer;
+        transition:
+          border-color 0.14s,
+          color 0.14s,
+          background 0.14s,
+          transform 0.05s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn:hover {
+        border-color: var(--teal);
+        color: var(--teal-deep);
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+      .btn.teal {
+        background: var(--teal);
+        border-color: var(--teal);
+        color: #fff;
+      }
+      .btn.teal:hover {
+        background: var(--teal-deep);
+        color: #fff;
+        border-color: var(--teal-deep);
+      }
+      .btn.ghost {
+        background: transparent;
+      }
+      .btnrow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        margin-top: 4px;
+      }
+
+      /* sliders */
+      .ctrl {
+        margin: 12px 0;
+      }
+      .ctrl label {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        font-size: 14px;
+        color: var(--ink-soft);
+        margin-bottom: 5px;
+      }
+      .ctrl label .v {
+        font-family: "IBM Plex Mono";
+        font-weight: 600;
+        color: var(--teal-deep);
+        font-size: 15px;
+      }
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 4px;
+        border-radius: 3px;
+        background: var(--line-strong);
+        outline: none;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 17px;
+        height: 17px;
+        border-radius: 50%;
+        background: var(--teal);
+        border: 2px solid var(--panel);
+        box-shadow: var(--shadow);
+        cursor: pointer;
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 17px;
+        height: 17px;
+        border-radius: 50%;
+        background: var(--teal);
+        border: 2px solid var(--panel);
+        cursor: pointer;
+      }
+
+      /* readouts + tables + formula */
+      .bigval {
+        font-family: "IBM Plex Mono";
+        font-weight: 600;
+        font-size: clamp(30px, 4.4vw, 52px);
+        line-height: 1;
+      }
+      .bigval.pos {
+        color: var(--teal-deep);
+      }
+      .bigval.neg {
+        color: var(--rust);
+      }
+      .subval {
+        font-size: 13px;
+        color: var(--ink-faint);
+        margin-top: 6px;
+      }
+      .formula {
+        font-family: "IBM Plex Mono";
+        background: rgba(24, 33, 41, 0.04);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 10px 14px;
+        font-size: clamp(14px, 1.5vw, 17px);
+        display: inline-block;
+        margin: 6px 0;
+      }
+      table.tbl {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: clamp(13px, 1.35vw, 16px);
+      }
+      table.tbl th,
+      table.tbl td {
+        text-align: right;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--line);
+      }
+      table.tbl th:first-child,
+      table.tbl td:first-child {
+        text-align: left;
+      }
+      table.tbl th {
+        font-family: "IBM Plex Mono";
+        font-size: 12px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        font-weight: 500;
+      }
+
+      /* card grid */
+      .cards {
+        display: grid;
+        gap: 12px;
+      }
+      .cards.c2 {
+        grid-template-columns: 1fr 1fr;
+      }
+      .cards.c3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      @media (max-width: 820px) {
+        .cards.c3,
+        .cards.c2 {
+          grid-template-columns: 1fr;
+        }
+      }
+      .rcard {
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--teal);
+        border-radius: var(--radius);
+        background: var(--panel);
+        padding: 13px 15px;
+        box-shadow: var(--shadow);
+      }
+      .rcard.c-amber {
+        border-left-color: var(--amber);
+      }
+      .rcard.c-rust {
+        border-left-color: var(--rust);
+      }
+      .rcard.c-blue {
+        border-left-color: var(--blue);
+      }
+      .rcard.c-slate {
+        border-left-color: var(--slate);
+      }
+      .rcard .n {
+        font-family: "IBM Plex Mono";
+        font-size: 11.5px;
+        color: var(--ink-faint);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .rcard h4 {
+        font-family: "Fraunces";
+        font-size: clamp(16px, 1.7vw, 19px);
+        margin: 4px 0 4px;
+      }
+      .rcard p {
+        margin: 0;
+        font-size: clamp(13px, 1.3vw, 15px);
+        color: var(--ink-soft);
+        line-height: 1.45;
+      }
+
+      /* references (thank-you slide) */
+      .refs {
+        margin-top: clamp(22px, 4vh, 40px);
+        font-size: clamp(12px, 1.2vw, 14px);
+        color: var(--ink-soft);
+        line-height: 1.7;
+        max-width: 74ch;
+        border-top: 1px solid var(--line);
+        padding-top: 16px;
+      }
+      .refs b {
+        color: var(--ink);
+      }
+
+      /* ── chrome: progress + nav + overview (canonical Week 1 style) ── */
+      #progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        background: var(--teal);
+        width: 0;
+        z-index: 40;
+        transition: width 0.4s ease;
+      }
+      #nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 clamp(14px, 3vw, 40px);
+        z-index: 40;
+        pointer-events: none;
+      }
+      #nav .slug {
+        font-family: "IBM Plex Mono";
+        font-size: 11.5px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        pointer-events: auto;
+      }
+      #nav .ctrls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        pointer-events: auto;
+      }
+      #nav .ctrls .count {
+        font-family: "IBM Plex Mono";
+        font-size: 13px;
+        color: var(--ink-soft);
+        min-width: 66px;
+        text-align: center;
+      }
+      #nav button {
+        width: 34px;
+        height: 34px;
+        border-radius: var(--radius);
+        border: 1px solid var(--line-strong);
+        background: var(--panel);
+        color: var(--ink-soft);
+        cursor: pointer;
+        font-size: 15px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          background 0.12s,
+          color 0.12s,
+          border-color 0.12s;
+      }
+      #nav button:hover {
+        background: #fff;
+        color: var(--ink);
+        border-color: var(--ink);
+      }
+      #nav button:focus-visible {
+        outline: 2px solid var(--teal);
+        outline-offset: 2px;
+      }
+      #overview {
+        position: fixed;
+        inset: 0;
+        background: rgba(241, 243, 239, 0.97);
+        z-index: 60;
+        display: none;
+        padding: clamp(24px, 5vh, 60px) clamp(20px, 5vw, 70px);
+        overflow-y: auto;
+      }
+      #overview.on {
+        display: block;
+      }
+      #overview h3 {
+        font-family: "Fraunces";
+        font-size: clamp(18px, 2.4vw, 26px);
+        margin: 0 0 18px;
+      }
+      .ovgrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+        gap: 12px;
+      }
+      .ovcell {
+        text-align: left;
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--line-strong);
+        border-radius: var(--radius);
+        background: var(--panel);
+        padding: 12px 14px;
+        cursor: pointer;
+        transition:
+          border-color 0.12s,
+          box-shadow 0.12s;
+        font: inherit;
+      }
+      .ovcell:hover {
+        border-left-color: var(--teal);
+        box-shadow: var(--shadow);
+      }
+      .ovcell.here {
+        border-left-color: var(--teal);
+      }
+      .ovcell .on {
+        font-family: "IBM Plex Mono";
+        font-size: 11px;
+        color: var(--teal-deep);
+        letter-spacing: 0.12em;
+      }
+      .ovcell .ot {
+        font-size: 14px;
+        color: var(--ink);
+        margin-top: 4px;
+        line-height: 1.3;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .slide {
+          transition: opacity 0.2s;
+          transform: none !important;
+        }
+        #progress {
+          transition: none;
+        }
+      }
+      @media print {
+        body {
+          overflow: visible;
+          background: #fff;
+        }
+        #progress,
+        #nav,
+        #overview {
+          display: none !important;
+        }
+        .slide {
+          position: relative;
+          opacity: 1 !important;
+          visibility: visible !important;
+          transform: none !important;
+          page-break-after: always;
+          min-height: 100vh;
+        }
+        .inner {
+          justify-content: flex-start;
+          padding-top: 40px;
+        }
+      }
+
+      /* ══════════════════════════════════════════════════════════════════
+         DECK-SPECIFIC STYLES — add this deck's one-off components below
+         ══════════════════════════════════════════════════════════════════ */
+      /* ---- portfolio game ---- */
+      .alloc {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: clamp(12.5px, 1.3vw, 15px);
+      }
+      .alloc th,
+      .alloc td {
+        padding: 7px 10px;
+        border-bottom: 1px solid var(--line);
+        text-align: right;
+        white-space: nowrap;
+      }
+      .alloc th {
+        font-family: "IBM Plex Mono";
+        font-size: 11px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        font-weight: 500;
+        border-bottom: 1px solid var(--line-strong);
+      }
+      .alloc td.asset,
+      .alloc th.asset {
+        text-align: left;
+        font-weight: 500;
+      }
+      .alloc td.asset .dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+      .alloc tbody tr:hover {
+        background: rgba(14, 124, 102, 0.04);
+      }
+      .alloc tfoot td {
+        border-top: 1px solid var(--line-strong);
+        border-bottom: none;
+        font-family: "IBM Plex Mono";
+        font-weight: 600;
+        padding-top: 9px;
+      }
+      .wt-in {
+        font-family: "IBM Plex Mono";
+        font-size: 14px;
+        width: 62px;
+        text-align: right;
+        padding: 5px 7px;
+        border: 1px solid var(--line-strong);
+        border-radius: var(--radius);
+        background: #fff;
+        color: var(--ink);
+        outline: none;
+      }
+      .wt-in:focus {
+        border-color: var(--teal);
+        box-shadow: 0 0 0 2px rgba(14, 124, 102, 0.14);
+      }
+      .totchip {
+        font-family: "IBM Plex Mono";
+        font-weight: 600;
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--line-strong);
+      }
+      .totchip.ok {
+        color: var(--teal-deep);
+        border-color: rgba(14, 124, 102, 0.4);
+        background: rgba(14, 124, 102, 0.08);
+      }
+      .totchip.bad {
+        color: var(--rust);
+        border-color: rgba(176, 71, 43, 0.4);
+        background: rgba(176, 71, 43, 0.07);
+      }
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 4px;
+      }
+      @media (max-width: 620px) {
+        .metrics {
+          grid-template-columns: 1fr;
+        }
+      }
+      .metric {
+        border: 1px solid var(--line);
+        border-top: 3px solid var(--teal);
+        border-radius: var(--radius);
+        background: var(--panel);
+        padding: 12px 14px;
+        box-shadow: var(--shadow);
+      }
+      .metric .k {
+        font-family: "IBM Plex Mono";
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+      }
+      .metric .val {
+        font-family: "IBM Plex Mono";
+        font-weight: 600;
+        font-size: clamp(24px, 3.2vw, 34px);
+        line-height: 1.05;
+        margin-top: 4px;
+      }
+      .metric .val.pos {
+        color: var(--teal-deep);
+      }
+      .metric .val.neg {
+        color: var(--rust);
+      }
+      .metric .hint {
+        font-size: 11.5px;
+        color: var(--ink-faint);
+        margin-top: 5px;
+      }
+      .metric.rr {
+        border-top-color: var(--blue);
+      }
+      .metric.risk {
+        border-top-color: var(--amber);
+      }
+      .pills {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .pill {
+        font-family: "IBM Plex Mono";
+        font-size: 12.5px;
+        padding: 6px 12px;
+        border: 1px solid var(--line-strong);
+        border-radius: 999px;
+        background: #fff;
+        color: var(--ink-soft);
+        cursor: pointer;
+        transition:
+          border-color 0.12s,
+          color 0.12s,
+          background 0.12s;
+      }
+      .pill:hover {
+        border-color: var(--teal);
+        color: var(--teal-deep);
+      }
+      .pill.on {
+        background: var(--teal);
+        border-color: var(--teal);
+        color: #fff;
+      }
+      .muted {
+        color: var(--ink-faint);
+        font-size: 12.5px;
+      }
+      .hidden {
+        display: none !important;
+      }
+      /* event card */
+      .eventcard {
+        border: 1px solid rgba(176, 71, 43, 0.35);
+        border-left: 4px solid var(--rust);
+        border-radius: var(--radius);
+        background: rgba(176, 71, 43, 0.045);
+        padding: clamp(14px, 2vw, 20px);
+        box-shadow: var(--shadow);
+      }
+      .newsflag {
+        font-family: "IBM Plex Mono";
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--rust);
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .newsflag::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--rust);
+        animation: blip 1.1s ease-in-out infinite;
+      }
+      @keyframes blip {
+        50% {
+          opacity: 0.25;
+        }
+      }
+      .eventcard h3 {
+        font-family: "Fraunces";
+        font-size: clamp(20px, 2.6vw, 28px);
+        margin: 6px 0 8px;
+      }
+      .eventcard p {
+        color: var(--ink-soft);
+        font-size: clamp(13px, 1.35vw, 15px);
+        line-height: 1.5;
+        margin: 0 0 8px;
+        max-width: 68ch;
+      }
+      .impact {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 10px;
+      }
+      @media (max-width: 760px) {
+        .impact {
+          grid-template-columns: 1fr;
+        }
+      }
+      .impact .box {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--panel);
+        padding: 10px 12px;
+      }
+      .impact .box .t {
+        font-family: "IBM Plex Mono";
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        margin-bottom: 6px;
+      }
+      .impact .box .row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13.5px;
+        padding: 2px 0;
+      }
+      .impact .box .row .up {
+        color: var(--teal-deep);
+        font-family: "IBM Plex Mono";
+        font-weight: 600;
+      }
+      .impact .box .row .down {
+        color: var(--rust);
+        font-family: "IBM Plex Mono";
+        font-weight: 600;
+      }
+      .impact .box .row .flat {
+        color: var(--ink-faint);
+        font-family: "IBM Plex Mono";
+        font-weight: 600;
+      }
+      /* before/after compare */
+      table.cmp {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: clamp(13px, 1.35vw, 15px);
+      }
+      table.cmp th,
+      table.cmp td {
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--line);
+        text-align: right;
+      }
+      table.cmp th:first-child,
+      table.cmp td:first-child {
+        text-align: left;
+      }
+      table.cmp th {
+        font-family: "IBM Plex Mono";
+        font-size: 11px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        font-weight: 500;
+      }
+      table.cmp td.num {
+        font-family: "IBM Plex Mono";
+      }
+      table.cmp .up {
+        color: var(--teal-deep);
+      }
+      table.cmp .down {
+        color: var(--rust);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="progress"></div>
+    <div class="deck" id="deck">
+      <!-- ══════════════════ 01 · TITLE ══════════════════ -->
+      <section class="slide" data-slug="Title">
+        <div class="inner">
+          <div class="eyebrow">
+            <span>Financial Economics Tutorial · Interactive</span
+            ><span class="idx">01</span>
+          </div>
+          <div class="title-sub">The Graduation Challenge</div>
+          <h1 class="title">
+            Build the best<br /><em>₹1,00,000 portfolio</em>
+          </h1>
+          <p class="body" style="margin-top: 18px; max-width: 56ch">
+            You have just graduated from <b>IIT Roorkee</b> with
+            <b>₹1,00,000</b> in savings. You know your own risk appetite. Ten
+            asset classes are open to you. Allocate, score your
+            <em>reward-per-unit-of-risk</em> — then find out whether your
+            portfolio survives a crisis.
+          </p>
+          <div class="title-meta">
+            <span class="who">Abhishek Kashyap</span>
+            <span class="title-course">Financial Economics Tutorial</span>
+            <span class="mail">abhishek_k@hs.iitr.ac.in</span>
+          </div>
+          <div class="kbd-hint">
+            Navigate with <span class="kbd">←</span>
+            <span class="kbd">→</span> · overview <span class="kbd">O</span> ·
+            fullscreen <span class="kbd">F</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════ 02 · ROUND 1 — BUILD ══════════════════ -->
+      <section class="slide" data-slug="Round 1 · Build">
+        <div class="inner top">
+          <div class="eyebrow">
+            <span>Round 1 · Construct &amp; score</span
+            ><span class="idx">02</span>
+          </div>
+          <h2 class="head sm">
+            Allocate your <em>₹1,00,000</em> across the ten assets
+          </h2>
+          <div class="two railL" style="align-items: start; margin-top: 4px">
+            <div class="panel grid">
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: baseline;
+                  margin-bottom: 8px;
+                "
+              >
+                <div class="chart-h" style="margin: 0">Allocation table</div>
+                <div class="muted">Weights must sum to 100%</div>
+              </div>
+              <table class="alloc">
+                <thead>
+                  <tr>
+                    <th class="asset">Asset</th>
+                    <th>Exp. return</th>
+                    <th>Risk (σ)</th>
+                    <th>Weight&nbsp;%</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody id="allocBody"><!-- rows injected --></tbody>
+                <tfoot>
+                  <tr>
+                    <td class="asset">Total</td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <span class="totchip bad" id="totChip">0%</span>
+                    </td>
+                    <td class="mono" id="totAmt">₹0</td>
+                  </tr>
+                </tfoot>
+              </table>
+              <div class="btnrow" style="margin-top: 12px">
+                <button class="btn teal" id="calcBtn">Calculate portfolio</button>
+                <button class="btn ghost" id="evenBtn">Even split</button>
+                <button class="btn ghost" id="normBtn">Normalise → 100%</button>
+                <button class="btn ghost" id="clrBtn">Clear</button>
+              </div>
+            </div>
+
+            <div>
+              <div class="panel" style="margin-bottom: 14px">
+                <div class="muted" style="margin-bottom: 6px">
+                  Your self-declared risk appetite
+                </div>
+                <div class="pills" id="appetitePills">
+                  <button class="pill" data-app="cons">Conservative</button>
+                  <button class="pill" data-app="bal">Balanced</button>
+                  <button class="pill" data-app="agg">Aggressive</button>
+                </div>
+                <div class="muted" id="appNote" style="margin-top: 8px"></div>
+              </div>
+
+              <div id="r1results" class="hidden">
+                <div class="metrics">
+                  <div class="metric">
+                    <div class="k">Expected return</div>
+                    <div class="val pos" id="mRet">—</div>
+                    <div class="hint">Σ wᵢ · rᵢ</div>
+                  </div>
+                  <div class="metric risk">
+                    <div class="k">Portfolio risk σₚ</div>
+                    <div class="val" id="mRisk">—</div>
+                    <div class="hint">√(wᵀ Σ w)</div>
+                  </div>
+                  <div class="metric rr">
+                    <div class="k">Return / risk</div>
+                    <div class="val" id="mRR">—</div>
+                    <div class="hint">reward-to-variability</div>
+                  </div>
+                </div>
+                <span class="callout" id="divNote" style="margin-top: 12px"
+                  >—</span
+                >
+                <div class="panel grid" style="margin-top: 14px">
+                  <div class="chart-h">Risk – return map</div>
+                  <div class="chart-cap">
+                    Each dot is an asset (hover to read it). The
+                    <b style="color: var(--teal-deep)">◆</b> is your portfolio —
+                    note how it can sit to the <em>left</em> of the assets it
+                    holds. That leftward gap is diversification.
+                  </div>
+                  <div class="chartwrap sm"><canvas id="rrChart"></canvas></div>
+                </div>
+              </div>
+              <div id="r1prompt" class="muted" style="margin-top: 6px">
+                Enter weights that total 100%, then press
+                <b>Calculate portfolio</b>. Correlations between assets are
+                modelled on the back end — you are scored on the diversified
+                risk, not a simple average.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════ 03 · ROUND 2 — THE CRISIS ══════════════════ -->
+      <section class="slide" data-slug="Round 2 · Crisis">
+        <div class="inner top">
+          <div class="eyebrow">
+            <span>Round 2 · Stress test</span><span class="idx">03</span>
+          </div>
+          <h2 class="head sm">
+            Can your portfolio <em>survive</em> a random market event?
+          </h2>
+          <div class="two" style="align-items: start; margin-top: 4px">
+            <div class="eventcard">
+              <span class="newsflag">Breaking news</span>
+              <h3>Event Card — Global Financial Crisis</h3>
+              <p>
+                A severe global financial crisis has erupted. The failure of
+                several large international financial institutions has spread
+                worldwide. Investor confidence has collapsed, banks are
+                reluctant to lend, businesses delay investment, and households
+                cut spending.
+              </p>
+              <p>
+                Stock markets see panic selling as investors flee risky assets
+                and rush into government-backed securities and gold. To preserve
+                liquidity, several banks temporarily restrict withdrawals and
+                stop paying interest on fixed deposits until the crisis
+                stabilises.
+              </p>
+              <div class="impact">
+                <div class="box">
+                  <div class="t">Equity markets</div>
+                  <div class="row"><span>Large Cap</span><span class="down">−10%</span></div>
+                  <div class="row"><span>Mid Cap</span><span class="down">−15%</span></div>
+                  <div class="row"><span>Small Cap</span><span class="down">−20%</span></div>
+                  <div class="row"><span>International Equity</span><span class="down">−10%</span></div>
+                </div>
+                <div class="box">
+                  <div class="t">Safe-haven assets</div>
+                  <div class="row"><span>Government Bonds</span><span class="up">+10%</span></div>
+                  <div class="row"><span>Gold</span><span class="up">+15%</span></div>
+                  <div class="t" style="margin-top: 10px">Real estate</div>
+                  <div class="row"><span>REITs</span><span class="down">−12%</span></div>
+                </div>
+                <div class="box">
+                  <div class="t">Banking system</div>
+                  <div class="row"><span>Savings — principal safe</span><span class="flat">0%</span></div>
+                  <div class="row"><span>Fixed Deposit — no interest</span><span class="flat">0%</span></div>
+                </div>
+                <div class="box">
+                  <div class="t">Unaffected this year</div>
+                  <div class="row"><span>Corporate Bond</span><span class="flat">0%</span></div>
+                  <div class="muted" style="margin-top: 6px">
+                    Only the listed movers change; everything else realises 0%
+                    for the crisis year.
+                  </div>
+                </div>
+              </div>
+              <div class="btnrow" style="margin-top: 14px">
+                <button class="btn teal" id="crisisBtn">
+                  Run the crisis on my portfolio →
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <div id="r2prompt" class="muted">
+                This applies the shock as each asset's <b>realised one-year
+                return</b>. Your ₹1,00,000 is revalued, then the surviving
+                weights drift and your forward-looking score is recomputed on
+                them.
+              </div>
+              <div id="r2results" class="hidden">
+                <div class="metrics">
+                  <div class="metric">
+                    <div class="k">Portfolio value after</div>
+                    <div class="val" id="cVal">—</div>
+                    <div class="hint" id="cValHint">started at ₹1,00,000</div>
+                  </div>
+                  <div class="metric risk">
+                    <div class="k">Realised return</div>
+                    <div class="val" id="cReal">—</div>
+                    <div class="hint">this crisis year</div>
+                  </div>
+                  <div class="metric rr">
+                    <div class="k">Fwd return / risk</div>
+                    <div class="val" id="cRR">—</div>
+                    <div class="hint">on drifted weights</div>
+                  </div>
+                </div>
+                <span class="callout" id="cVerdict" style="margin-top: 12px">—</span>
+                <div class="panel grid" style="margin-top: 14px">
+                  <div class="chart-h">Before vs after the crisis</div>
+                  <table class="cmp" style="margin-top: 6px">
+                    <thead>
+                      <tr>
+                        <th>Metric</th>
+                        <th>Pre-crisis</th>
+                        <th>Post-crisis</th>
+                      </tr>
+                    </thead>
+                    <tbody id="cmpBody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════ LAST · DEBRIEF ══════════════════ -->
+      <section class="slide" data-slug="Debrief">
+        <div class="inner top">
+          <div class="eyebrow">
+            <span>Debrief · What the game taught</span
+            ><span class="idx">04</span>
+          </div>
+          <h2 class="head sm">
+            Reward is easy. <em>Risk-adjusted</em> reward is the game.
+          </h2>
+          <div class="cards c2" style="margin-top: 6px">
+            <div class="rcard">
+              <div class="n">Lesson 01 · Diversification</div>
+              <h4>Portfolio risk &lt; average of the parts</h4>
+              <p>
+                Because σₚ = √(wᵀΣw) and correlations are below 1, combining
+                imperfectly-correlated assets lowers risk without a matching
+                drop in return. Your portfolio dot sat left of a naïve weighted
+                average of the σ's — that gap is a free lunch, in Markowitz's
+                phrase.
+              </p>
+            </div>
+            <div class="rcard c-amber">
+              <div class="n">Lesson 02 · Reward-to-variability</div>
+              <h4>Return ÷ risk ranks portfolios, not return alone</h4>
+              <p>
+                A 100% small-cap book earns 18% but scores ≈0.51; a bond-and-gold
+                tilt earns less yet scores higher. The ratio is a Sharpe-style
+                measure (here without subtracting the risk-free rate).
+              </p>
+            </div>
+            <div class="rcard c-blue">
+              <div class="n">Lesson 03 · Correlation is hidden risk</div>
+              <h4>Equities move together when it matters</h4>
+              <p>
+                Large, mid, small and international equity carry high pairwise
+                correlation (≈0.6–0.9), so an all-equity book is far less
+                diversified than it looks. In the crisis they fell in unison.
+              </p>
+            </div>
+            <div class="rcard c-rust">
+              <div class="n">Lesson 04 · Tail events</div>
+              <h4>Safe havens earn their keep in a crisis</h4>
+              <p>
+                Government bonds and gold rose while equities and REITs fell —
+                the flight-to-safety that shows up as low/negative correlation
+                in calm times and pays off in the tail.
+              </p>
+            </div>
+          </div>
+          <div class="refs">
+            <b>References &amp; reading</b>
+            <div>
+              Markowitz, H. (1952). Portfolio Selection.
+              <i>The Journal of Finance</i>, 7(1), 77–91.
+            </div>
+            <div>
+              Sharpe, W. F. (1966). Mutual Fund Performance.
+              <i>The Journal of Business</i>, 39(1), 119–138.
+            </div>
+            <div>
+              Bodie, Z., Kane, A., &amp; Marcus, A. J. (2021).
+              <i>Investments</i> (12th ed.). McGraw-Hill.
+            </div>
+            <div>
+              Ang, A. (2014). <i>Asset Management: A Systematic Approach to
+              Factor Investing</i>. Oxford University Press.
+            </div>
+          </div>
+          <div class="title-meta" style="margin-top: 22px">
+            <span class="who">Abhishek Kashyap</span>
+            <span class="mail">abhishek_k@hs.iitr.ac.in</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- overview (populated by the engine) -->
+    <div id="overview">
+      <h3>Overview — jump to a slide</h3>
+      <div class="ovgrid" id="ovgrid"></div>
+    </div>
+
+    <!-- nav (canonical: slug · prev · counter · next · overview · fullscreen) -->
+    <div id="nav">
+      <span class="slug" id="slug">Title</span>
+      <div class="ctrls">
+        <button id="prev" title="Previous (←)" aria-label="Previous">‹</button>
+        <span class="count" id="count">01 / 04</span>
+        <button id="next" title="Next (→)" aria-label="Next">›</button>
+        <button id="ovBtn" title="Overview (O)" aria-label="Overview">▦</button>
+        <button id="fsBtn" title="Fullscreen (F)" aria-label="Fullscreen">
+          ⤢
+        </button>
+      </div>
+    </div>
+
+    <script>
+      "use strict";
+      /* ══════════════════════════════════════════════════════════════════
+         ENGINE — navigation, overview, keyboard, swipe, fullscreen (do not edit)
+         ══════════════════════════════════════════════════════════════════ */
+      const COL = {
+        paper: "#f1f3ef",
+        panel: "#fbfcfa",
+        ink: "#182129",
+        inkSoft: "#4a5760",
+        inkFaint: "#8b979e",
+        line: "#d7dcd4",
+        lineStrong: "#c3cabf",
+        teal: "#0e7c66",
+        tealDeep: "#0a5a4a",
+        amber: "#b9822b",
+        rust: "#b0472b",
+        blue: "#3b6c8c",
+        slate: "#6b7a82",
+      };
+      const $ = (id) => document.getElementById(id);
+      const pad = (n) => String(n).padStart(2, "0");
+
+      if (window.Chart) {
+        Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
+        Chart.defaults.font.size = 13;
+        Chart.defaults.color = COL.slate;
+        Chart.defaults.plugins.legend.labels.boxWidth = 12;
+        Chart.defaults.plugins.legend.labels.font = {
+          family: "'IBM Plex Mono'",
+          size: 12,
+        };
+      }
+
+      const slides = Array.from(document.querySelectorAll(".slide"));
+      const TOTAL = slides.length;
+      let cur = 0;
+      const initialized = {};
+
+      function show(i) {
+        i = Math.max(0, Math.min(TOTAL - 1, i));
+        slides[cur].classList.remove("active");
+        cur = i;
+        slides[cur].classList.add("active");
+        $("progress").style.width = ((cur + 1) / TOTAL) * 100 + "%";
+        $("count").textContent = pad(cur + 1) + " / " + pad(TOTAL);
+        $("slug").textContent = slides[cur].dataset.slug || "";
+        document
+          .querySelectorAll(".ovcell")
+          .forEach((c, idx) => c.classList.toggle("here", idx === cur));
+        if (!initialized[cur]) {
+          initialized[cur] = true;
+          if (initFns[cur]) requestAnimationFrame(() => initFns[cur]());
+        }
+        try {
+          history.replaceState(null, "", "#" + (cur + 1));
+        } catch (e) {}
+      }
+      const next = () => show(cur + 1);
+      const prev = () => show(cur - 1);
+      $("next").onclick = next;
+      $("prev").onclick = prev;
+
+      /* overview grid */
+      const ovgrid = $("ovgrid");
+      slides.forEach((s, idx) => {
+        const b = document.createElement("button");
+        b.className = "ovcell";
+        b.innerHTML =
+          '<div class="on">' +
+          pad(idx + 1) +
+          '</div><div class="ot">' +
+          (s.dataset.slug || "") +
+          "</div>";
+        b.onclick = () => {
+          show(idx);
+          $("overview").classList.remove("on");
+        };
+        ovgrid.appendChild(b);
+      });
+      function toggleOverview() {
+        $("overview").classList.toggle("on");
+      }
+      function toggleFs() {
+        if (!document.fullscreenElement)
+          document.documentElement.requestFullscreen?.();
+        else document.exitFullscreen?.();
+      }
+      $("ovBtn").onclick = toggleOverview;
+      $("fsBtn").onclick = toggleFs;
+
+      /* keyboard */
+      document.addEventListener("keydown", (e) => {
+        const tag = document.activeElement
+          ? document.activeElement.tagName
+          : "";
+        if (
+          ["INPUT", "TEXTAREA"].includes(tag) &&
+          ["ArrowLeft", "ArrowRight"].includes(e.key)
+        )
+          return;
+        if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
+          e.preventDefault();
+          next();
+        } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+          e.preventDefault();
+          prev();
+        } else if (e.key === "Home") {
+          show(0);
+        } else if (e.key === "End") {
+          show(TOTAL - 1);
+        } else if (e.key.toLowerCase() === "o") {
+          toggleOverview();
+        } else if (e.key.toLowerCase() === "f") {
+          toggleFs();
+        } else if (e.key === "Escape") {
+          $("overview").classList.remove("on");
+        }
+      });
+
+      /* touch swipe (ignores swipes that start on a control) */
+      let tx = 0;
+      document.addEventListener(
+        "touchstart",
+        (e) => (tx = e.changedTouches[0].clientX),
+        { passive: true },
+      );
+      document.addEventListener(
+        "touchend",
+        (e) => {
+          const t = e.target;
+          if (
+            t.closest &&
+            (t.closest("input") ||
+              t.closest("button") ||
+              t.closest("a") ||
+              t.closest("table"))
+          )
+            return;
+          const dx = e.changedTouches[0].clientX - tx;
+          if (Math.abs(dx) > 65) {
+            dx < 0 ? next() : prev();
+          }
+        },
+        { passive: true },
+      );
+
+      /* ══════════════════════════════════════════════════════════════════
+         PER-SLIDE INITIALIZERS — add one entry per interactive slide.
+         Key = slide index (0-based). Runs once, the first time that slide
+         is shown. Static slides need no entry. Example below is for slide
+         index 2 (the "Interactive pattern" slide).
+         ══════════════════════════════════════════════════════════════════ */
+      const initFns = {};
+
+      /* ─────────────── PORTFOLIO GAME ─────────────── */
+      /* Assets: name, expected return, std-dev, colour, crisis realised return */
+      const ASSETS = [
+        { n: "Savings Account",     r: 0.03, s: 0.005, c: COL.slate,    k: 0.00 },
+        { n: "Fixed Deposit",       r: 0.06, s: 0.010, c: COL.slate,    k: 0.00 },
+        { n: "Government Bond",     r: 0.07, s: 0.050, c: COL.blue,     k: 0.10 },
+        { n: "Gold",                r: 0.09, s: 0.150, c: COL.amber,    k: 0.15 },
+        { n: "Largecap Stocks",     r: 0.12, s: 0.180, c: COL.teal,     k: -0.10 },
+        { n: "Midcap Stocks",       r: 0.15, s: 0.240, c: COL.tealDeep, k: -0.15 },
+        { n: "Smallcap Stocks",     r: 0.18, s: 0.350, c: COL.rust,     k: -0.20 },
+        { n: "REITs",               r: 0.11, s: 0.170, c: "#8a6d3b",    k: -0.12 },
+        { n: "Corporate Bond",      r: 0.08, s: 0.090, c: "#4f7a8a",    k: 0.00 },
+        { n: "International Stocks", r: 0.13, s: 0.200, c: "#6a5acd",    k: -0.10 },
+      ];
+      const N = ASSETS.length;
+      const CAPITAL = 100000;
+
+      /* Hidden correlation matrix (stylised real-world, PSD-verified). */
+      const CORR = [
+        [1.00, 0.90, 0.15, 0.00, 0.00, 0.00, 0.00, 0.00, 0.10, 0.00],
+        [0.90, 1.00, 0.20, 0.00, 0.00, 0.00, 0.00, 0.00, 0.15, 0.00],
+        [0.15, 0.20, 1.00, 0.25, -0.20, -0.20, -0.15, 0.10, 0.65, -0.15],
+        [0.00, 0.00, 0.25, 1.00, 0.00, 0.00, 0.00, 0.10, 0.15, 0.05],
+        [0.00, 0.00, -0.20, 0.00, 1.00, 0.85, 0.75, 0.60, 0.25, 0.70],
+        [0.00, 0.00, -0.20, 0.00, 0.85, 1.00, 0.88, 0.58, 0.22, 0.65],
+        [0.00, 0.00, -0.15, 0.00, 0.75, 0.88, 1.00, 0.52, 0.18, 0.58],
+        [0.00, 0.00, 0.10, 0.10, 0.60, 0.58, 0.52, 1.00, 0.30, 0.55],
+        [0.10, 0.15, 0.65, 0.15, 0.25, 0.22, 0.18, 0.30, 1.00, 0.22],
+        [0.00, 0.00, -0.15, 0.05, 0.70, 0.65, 0.58, 0.55, 0.22, 1.00],
+      ];
+
+      const fmtPct = (x, d = 2) => (x * 100).toFixed(d) + "%";
+      const fmtINR = (x) =>
+        "₹" +
+        Math.round(x).toLocaleString("en-IN", { maximumFractionDigits: 0 });
+
+      /* metrics from weight FRACTIONS (array length N) */
+      function metrics(w) {
+        let er = 0;
+        for (let i = 0; i < N; i++) er += w[i] * ASSETS[i].r;
+        let v = 0;
+        for (let i = 0; i < N; i++)
+          for (let j = 0; j < N; j++)
+            v += w[i] * w[j] * ASSETS[i].s * ASSETS[j].s * CORR[i][j];
+        const sd = Math.sqrt(Math.max(v, 0));
+        let waSd = 0; // naïve weighted-average σ (no diversification)
+        for (let i = 0; i < N; i++) waSd += w[i] * ASSETS[i].s;
+        return { er, sd, rr: sd > 1e-9 ? er / sd : 0, waSd };
+      }
+
+      const STATE = { weights: null, m: null, appetite: null };
+
+      const APP = {
+        cons: { label: "Conservative", lo: 0, hi: 0.08 },
+        bal: { label: "Balanced", lo: 0.08, hi: 0.16 },
+        agg: { label: "Aggressive", lo: 0.16, hi: 1 },
+      };
+
+      /* ---------- Round 1 ---------- */
+      initFns[1] = function () {
+        const body = $("allocBody");
+        // build rows
+        ASSETS.forEach((a, i) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML =
+            '<td class="asset"><span class="dot" style="background:' +
+            a.c +
+            '"></span>' +
+            a.n +
+            "</td>" +
+            '<td class="mono">' +
+            fmtPct(a.r, 0) +
+            "</td>" +
+            '<td class="mono">' +
+            fmtPct(a.s, 1) +
+            "</td>" +
+            '<td><input class="wt-in" id="w' +
+            i +
+            '" type="number" min="0" max="100" step="1" value="0" inputmode="decimal"></td>' +
+            '<td class="mono" id="amt' +
+            i +
+            '">₹0</td>';
+          body.appendChild(tr);
+        });
+
+        const inputs = ASSETS.map((_, i) => $("w" + i));
+
+        function readW() {
+          return inputs.map((el) => {
+            const v = parseFloat(el.value);
+            return isNaN(v) || v < 0 ? 0 : v;
+          });
+        }
+        function refreshTotals() {
+          const pct = readW();
+          const sum = pct.reduce((a, b) => a + b, 0);
+          pct.forEach(
+            (p, i) => ($("amt" + i).textContent = fmtINR((p / 100) * CAPITAL)),
+          );
+          const chip = $("totChip");
+          chip.textContent = (Math.round(sum * 100) / 100).toString() + "%";
+          $("totAmt").textContent = fmtINR((sum / 100) * CAPITAL);
+          const ok = Math.abs(sum - 100) < 0.5;
+          chip.className = "totchip " + (ok ? "ok" : "bad");
+          $("calcBtn").disabled = !ok;
+          $("calcBtn").style.opacity = ok ? "1" : "0.5";
+          $("calcBtn").style.cursor = ok ? "pointer" : "not-allowed";
+          return { pct, sum, ok };
+        }
+        inputs.forEach((el) => el.addEventListener("input", refreshTotals));
+
+        $("evenBtn").onclick = () => {
+          inputs.forEach((el) => (el.value = (100 / N).toFixed(1)));
+          refreshTotals();
+        };
+        $("clrBtn").onclick = () => {
+          inputs.forEach((el) => (el.value = 0));
+          refreshTotals();
+        };
+        $("normBtn").onclick = () => {
+          const pct = readW();
+          const sum = pct.reduce((a, b) => a + b, 0);
+          if (sum <= 0) return;
+          inputs.forEach(
+            (el, i) => (el.value = ((pct[i] / sum) * 100).toFixed(1)),
+          );
+          refreshTotals();
+        };
+
+        // scatter of assets + portfolio marker
+        const chart = new Chart($("rrChart"), {
+          type: "scatter",
+          data: {
+            datasets: [
+              {
+                label: "Assets",
+                data: ASSETS.map((a) => ({ x: a.s * 100, y: a.r * 100, n: a.n })),
+                pointBackgroundColor: ASSETS.map((a) => a.c),
+                pointRadius: 5,
+                pointHoverRadius: 7,
+              },
+              {
+                label: "Your portfolio",
+                data: [],
+                pointStyle: "rectRot",
+                pointBackgroundColor: COL.tealDeep,
+                pointBorderColor: "#fff",
+                pointBorderWidth: 1.5,
+                pointRadius: 10,
+                pointHoverRadius: 12,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (c) =>
+                    (c.raw.n || "Your portfolio") +
+                    "  σ=" +
+                    c.raw.x.toFixed(1) +
+                    "%  E[r]=" +
+                    c.raw.y.toFixed(1) +
+                    "%",
+                },
+              },
+            },
+            scales: {
+              x: {
+                title: { display: true, text: "Risk σ (%)" },
+                grid: { color: COL.line },
+                beginAtZero: true,
+              },
+              y: {
+                title: { display: true, text: "Expected return (%)" },
+                grid: { color: COL.line },
+                beginAtZero: true,
+              },
+            },
+          },
+        });
+
+        $("calcBtn").onclick = () => {
+          const { pct, ok } = refreshTotals();
+          if (!ok) return;
+          const w = pct.map((p) => p / 100);
+          const m = metrics(w);
+          STATE.weights = w;
+          STATE.m = m;
+
+          $("mRet").textContent = fmtPct(m.er);
+          $("mRisk").textContent = fmtPct(m.sd);
+          $("mRR").textContent = m.rr.toFixed(2);
+
+          const benefit = m.waSd - m.sd;
+          $("divNote").innerHTML =
+            "Diversification benefit: a naïve weighted-average risk would be <b>" +
+            fmtPct(m.waSd) +
+            "</b>; correlations pull your actual risk down to <b>" +
+            fmtPct(m.sd) +
+            "</b> — a saving of <b>" +
+            (benefit * 100).toFixed(2) +
+            " pp</b>.";
+
+          chart.data.datasets[1].data = [
+            { x: m.sd * 100, y: m.er * 100, n: "Your portfolio" },
+          ];
+          chart.update();
+
+          $("r1prompt").classList.add("hidden");
+          $("r1results").classList.remove("hidden");
+          applyAppetite();
+        };
+
+        // appetite pills
+        function applyAppetite() {
+          if (!STATE.appetite) {
+            $("appNote").textContent = "";
+            return;
+          }
+          const a = APP[STATE.appetite];
+          if (!STATE.m) {
+            $("appNote").innerHTML =
+              a.label +
+              " · target portfolio risk " +
+              (a.lo * 100).toFixed(0) +
+              (a.hi >= 1 ? "%+" : "–" + (a.hi * 100).toFixed(0) + "%");
+            return;
+          }
+          const sd = STATE.m.sd;
+          const inband = sd >= a.lo && sd < a.hi;
+          $("appNote").innerHTML =
+            "Your risk <b>" +
+            fmtPct(sd) +
+            "</b> vs " +
+            a.label +
+            " band " +
+            (a.lo * 100).toFixed(0) +
+            (a.hi >= 1 ? "%+" : "–" + (a.hi * 100).toFixed(0) + "%") +
+            " — " +
+            (inband
+              ? '<span style="color:var(--teal-deep)">a good match.</span>'
+              : sd < a.lo
+                ? '<span style="color:var(--amber)">more cautious than your stated appetite.</span>'
+                : '<span style="color:var(--rust)">riskier than your stated appetite.</span>');
+        }
+        document.querySelectorAll("#appetitePills .pill").forEach((p) => {
+          p.onclick = () => {
+            document
+              .querySelectorAll("#appetitePills .pill")
+              .forEach((x) => x.classList.remove("on"));
+            p.classList.add("on");
+            STATE.appetite = p.dataset.app;
+            applyAppetite();
+          };
+        });
+
+        refreshTotals();
+      };
+
+      /* ---------- Round 2 ---------- */
+      initFns[2] = function () {
+        $("crisisBtn").onclick = () => {
+          if (!STATE.weights) {
+            $("r2prompt").innerHTML =
+              '<span style="color:var(--rust)">Complete Round 1 first — go back, set weights totalling 100% and press <b>Calculate portfolio</b>.</span>';
+            return;
+          }
+          const w = STATE.weights;
+          const before = STATE.m;
+
+          // realised crisis-year value per asset
+          const valAfter = w.map((wi, i) => wi * CAPITAL * (1 + ASSETS[i].k));
+          const total = valAfter.reduce((a, b) => a + b, 0);
+          const realised = total / CAPITAL - 1;
+
+          // drifted weights and forward metrics
+          const wDrift = valAfter.map((v) => v / total);
+          const after = metrics(wDrift);
+
+          $("cVal").textContent = fmtINR(total);
+          $("cVal").className = "val " + (total >= CAPITAL ? "pos" : "neg");
+          $("cValHint").textContent =
+            (total >= CAPITAL ? "up " : "down ") +
+            fmtINR(Math.abs(total - CAPITAL)) +
+            " from ₹1,00,000";
+
+          $("cReal").textContent =
+            (realised >= 0 ? "+" : "") + fmtPct(realised);
+          $("cReal").className = "val " + (realised >= 0 ? "pos" : "neg");
+
+          $("cRR").textContent = after.rr.toFixed(2);
+          $("cRR").className = "val " + (after.rr >= before.rr ? "pos" : "");
+
+          const survived = total >= CAPITAL;
+          $("cVerdict").className =
+            "callout" + (survived ? "" : " warn");
+          $("cVerdict").innerHTML = survived
+            ? "Your portfolio <b>survived</b> — safe havens and diversification offset the equity drawdown, ending above your starting capital."
+            : "Your portfolio <b>took a hit</b> — the equity/REIT exposure outweighed the safe-haven cushion. This is the cost of chasing return without enough uncorrelated ballast.";
+
+          const rows = [
+            ["Portfolio value", fmtINR(CAPITAL), fmtINR(total)],
+            [
+              "Expected return (fwd)",
+              fmtPct(before.er),
+              fmtPct(after.er),
+            ],
+            ["Portfolio risk σₚ", fmtPct(before.sd), fmtPct(after.sd)],
+            [
+              "Return / risk",
+              before.rr.toFixed(2),
+              after.rr.toFixed(2),
+            ],
+            ["Realised crisis return", "—", (realised >= 0 ? "+" : "") + fmtPct(realised)],
+          ];
+          $("cmpBody").innerHTML = rows
+            .map(
+              (r) =>
+                "<tr><td>" +
+                r[0] +
+                '</td><td class="num">' +
+                r[1] +
+                '</td><td class="num">' +
+                r[2] +
+                "</td></tr>",
+            )
+            .join("");
+
+          $("r2prompt").classList.add("hidden");
+          $("r2results").classList.remove("hidden");
+        };
+      };
+
+      /* boot — honour a #n hash for deep-linking (e.g. …/deck.html#3) */
+      const start = Math.max(
+        0,
+        (parseInt((location.hash || "").slice(1), 10) || 1) - 1,
+      );
+      show(Math.min(start, TOTAL - 1));
+    </script>
+  </body>
+</html>
