@@ -19,7 +19,7 @@ Week3_InvestmentReturns/
 ## Live access
 
 - **Week 3 Slides:** https://abhishekshyp.github.io/financial-economics/Week3_InvestmentReturns/sl_InvestmentsAndReturns#1
-- **Week 3 Tool:** https://abhishekshyp.github.io/financial-economics/Week3_InvestmentReturns/
+- **Week 3 Tool:** https://abhishekshyp.github.io/financial-economics/Week3_InvestmentReturns/portfolioChallenge
 
 ---
 
@@ -63,12 +63,6 @@ The graded take-home. Students pull real historical data for seven asset classes
 - **NSE, Market Pulse (March 2026)** — ownership of Indian listed equity.
 - **Investopedia / Peter Gratton** — *Strategic Asset Allocation: Definition & Example*.
 - **Market data:** NSE, BSE, NIFTY Indices, AMFI, Yahoo / Google Finance, Screener, Tijori, TradingView.
-
----
-
-## Submission
-
-See **`assignmentWeek3.md`** for the full brief. Submit **before the next tutorial** to the Week-3 folder in the course submission drive, using the naming convention `RollNumber_FullName.extension` (e.g. `22617001_AbhishekKashyap.ipynb`). Teams of up to 3 are allowed; list every member's name and roll number on the first page.
 
 ---
 
