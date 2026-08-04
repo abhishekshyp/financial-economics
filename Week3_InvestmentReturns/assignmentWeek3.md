@@ -41,12 +41,9 @@ For **every** asset class, compute and report:
 
 ## Part B — Build your portfolio
 
-You have **₹1,00,000** and you know your own risk appetite (use your Week-2 risk score, or state one).
+You have just graduated from IIT Roorkee with ₹1,00,000 in savings. You know your own risk appetite. Ten asset classes are open to you. Allocate, score your reward-per-unit-of-risk — then find out whether your portfolio survives a crisis.
 
-1. **Assign weights** `w_i` across the seven classes (`Σ w_i = 1`, no shorting unless you justify it). Tie the weights explicitly to your risk score — a lower score should tilt toward FDs/G-secs; a higher score toward mid/small cap and equities.
-2. **Portfolio expected return:** `μ_p = Σ w_i μ_i`.
-3. **Portfolio risk:** `σ_p = √( Σ_i Σ_j w_i w_j σ_i σ_j ρ_ij )`. You will need the **correlation matrix** `ρ_ij` — estimate it from the same return series and include it in your submission. (Assuming zero correlation is *wrong* and will overstate diversification — show the real matrix.)
-4. **Reward per unit of risk:** report `μ_p / σ_p`. Do the same for each individual asset so you can compare.
+Play the game: https://abhishekshyp.github.io/financial-economics/Week3_InvestmentReturns/portfolioChallenge.html#1
 
 ---
 
@@ -63,7 +60,6 @@ You have **₹1,00,000** and you know your own risk appetite (use your Week-2 ri
 
 Pick **one** — all are equally acceptable; choose the one that lets you think best.
 
-- **Python** — `yfinance` / CSV downloads + `pandas` / `numpy`; compute returns, the covariance matrix, and the return-vs-risk chart from scratch.
 - **Excel** — a transparent workbook: returns as live formulas, `STDEV`/`AVERAGE` for μ and σ, `CORREL` for the matrix, and a scatter chart. Keep every figure a formula, not a hard-coded number.
 
 **Cite every data source** — include the exact links / tickers and the download date. Reproducibility is graded.
@@ -72,15 +68,29 @@ Pick **one** — all are equally acceptable; choose the one that lets you think 
 
 ## Teams
 
-Work **individually or in a team of up to 3**. All members contribute across Parts A and B.
+Work **individually**.
 
 ---
 
 ## What to submit
 
-1. **Your workings** — the Python notebook / script or the Excel workbook.
-2. **A short write-up (1–3 pages)** — the seven μ/σ estimates, the return-vs-risk chart, your correlation matrix, your chosen weights and the reasoning that ties them to your risk score, and your portfolio's μ, σ, and reward/risk ratio. Close with one paragraph answering: *did diversification actually pay, and why?*
+1. **Your workings** — Excel workbook.
+2. **A short write-up (1–3 pages)** — the seven μ/σ estimates, the return-vs-risk chart, your correlation matrix, your chosen weights and the reasoning that ties them to your risk score, and your portfolio's μ, σ, and reward/risk ratio.
 
 **State every assumption clearly.** A modest analysis with honest, well-argued assumptions beats an elaborate one you can't defend.
 
-Naming convention: `RollNumber_FullName`. Submit before the next tutorial.
+---
+
+## Grading
+
+This is a **completion grade — 2 marks for submitting.** All three tasks in, and the marks are yours; there's no quality scoring.
+
+## Submission
+
+- **Deadline:** before the next tutorial.
+- **Naming convention:** `RollNumber_FullName.extension` (e.g. `21112001_AbhishekKashyap.ipynb`, `..._RiskScore.xlsx`, `..._Tool.html`). Submit the coin-flip result as `RollNumber_FullName_Coin.pdf` (or the site's native file). For teams, submit one set under the team lead's `RollNumber_FullName` and list all members on page 1.
+- **Upload folder:** https://drive.google.com/drive/folders/1iGKPvFCisDUvshyZjz474NDy_SrkOCTv?usp=sharing
+
+---
+
+*Figures in this brief are illustrative and for teaching only — not financial advice.*
