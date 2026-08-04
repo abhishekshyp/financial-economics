@@ -83,7 +83,7 @@ Work **individually**.
 
 ## Grading
 
-This is a **completion grade — 2 marks for submitting.** All three tasks in, and the marks are yours; there's no quality scoring.
+This is a **completion grade — 2 marks for submitting.** Complete all the tasks, and the marks are yours; there's no quality scoring.
 
 ## Submission
 
