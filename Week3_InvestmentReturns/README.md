@@ -10,7 +10,7 @@ This is the first half of the two-week **Build Your Personal Portfolio** arc. It
 
 ```
 Week3_InvestmentReturns/
-├── index.html                     # the portfolio challenge — the "Play" tool
+├── portfolioChallenge.html        # the portfolio challenge — the "Play" tool
 ├── sl_InvestmentsAndReturns.html  # interactive lecture slides
 ├── assignmentWeek3.md             # week 3 assignment
 └── README.md                      # this file
@@ -25,7 +25,7 @@ Week3_InvestmentReturns/
 
 ## What each file does
 
-### `index.html` — the portfolio challenge (Play)
+### `portfolioChallenge.html` — the portfolio challenge (Play)
 
 The hands-on opener. You have just graduated from **IIT Roorkee** with **₹1,00,000** in savings and know your own risk appetite. Ten asset classes are open to you: **allocate** across them, **score** your portfolio's reward-per-unit-of-risk, and then **stress-test** whether the allocation survives a crisis. It builds the intuition — the return–risk trade-off and the value of diversification — that the slides then explain formally.
 
