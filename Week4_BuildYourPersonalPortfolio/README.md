@@ -41,19 +41,6 @@ Week4_BuildYourPersonalPortfolio/
 
 ---
 
-## Concepts covered
-
-- **Annualisation and sampling frequency** — that `mean × N` and `σ × √N` recover (up to sampling noise) the same annualised figures whether returns are sampled daily, weekly, or monthly, and why the mean scales linearly while risk scales with the square root.
-- **From weights to a portfolio** — converting target weights and an initial corpus into share quantities, tracking a daily portfolio value with `SUMPRODUCT`, and reading off portfolio return, risk, and reward-per-unit-of-risk.
-- **Correlation as the engine of diversification** — the difference between the naïve weighted-average risk `Σ wᵢσᵢ` and true portfolio risk, and the result that the gap widens as correlation falls.
-- **The two-asset frontier** — how portfolio risk traces from `σₚ = w_Aσ_A + w_Bσ_B` at ρ = +1 down toward the possibility of a zero-risk combination at ρ = −1.
-- **The variance–covariance matrix and the quadratic form** — portfolio variance as `wᵀΣw`, the generalisation of the two-asset formula to n assets, and why the off-diagonal covariance terms dominate risk in a large book.
-- **Mean-variance optimisation** — the three canonical programs (minimum variance, maximum return/risk, and a target-return or constrained solve) and how each is expressed as a Solver objective plus constraints.
-- **Constrained construction** — imposing a full-investment constraint (Σw = 1), no-short bounds (w ≥ 0), and asset-level caps/floors, and reading the cost of those constraints in forgone return/risk.
-- **Benchmarking** — judging a constructed portfolio against an equal-weighted portfolio and a market index, and interpreting its correlation to the index as a measure of active differentiation.
-
----
-
 ## The mathematics
 
 Notation is standard: *r* a return, *E[·]* an expectation, *σ* a volatility, *ρ* a correlation, *w* a weight vector, **Σ** the annualised variance–covariance matrix. Daily statistics are annualised with a 252-trading-day convention throughout.
@@ -110,49 +97,6 @@ Constrained / target-return portfolio:
 min_w   wᵀ Σ w      s.t.  Σ wᵢ = 1,  wᵀ μ ≥ r*,  Lᵢ ≤ wᵢ ≤ Uᵢ
 ```
 Each is a single Solver run: the objective cell is `σₚ²` or `Return/Risk`, the decision cells are `P6:U6`, and the constraints are entered in the Solver dialog. The min-variance and max-return/risk solves trace two named points on the efficient frontier; the constrained solve shows the frontier-relative cost of the weight rules.
-
----
-
-## The workbook at a glance
-
-Use these figures — computed from the shipped price data — to confirm your copy behaves correctly after you populate the covariance matrix and run Solver.
-
-### Per-asset annualised statistics — asset-class set (daily, 2016-01-01 → 2026-08-18; 2,477 return observations)
-
-| Asset | Annualised return | Annualised σ | Return/Risk |
-|---|---|---|---|
-| Nifty TRI | 14.67% | 16.19% | 0.91 |
-| Midcap TRI | 18.58% | 17.56% | 1.06 |
-| Smallcap TRI | 15.80% | 19.22% | 0.82 |
-| GoldBeES | 16.91% | 13.29% | 1.27 |
-| G-Sec | 6.46% | 4.20% | 1.54 |
-| S&P 500 (INR) | 18.84% | 17.68% | 1.07 |
-
-The single asset with the best stand-alone return/risk is the G-Sec — a reminder that the optimiser is not chasing return, and that a low-volatility, low-correlation asset earns its weight through the covariance terms, not its mean.
-
-### Two-asset diversification — Nifty TRI + G-Sec, 50/50
-
-| | Ignoring correlation | With correlation (ρ ≈ 0.06) |
-|---|---|---|
-| Portfolio return | 10.57% | 10.57% |
-| Portfolio risk | 10.20% | **8.49%** |
-| Return/Risk | 1.04 | **1.24** |
-
-Return is unchanged; risk falls ~17% and the reward-per-unit-of-risk rises from 1.04 to 1.24 — diversification improving the score without touching expected return, the "only free lunch in finance."
-
-### Constrained single-stock portfolio (daily, 2023-08-31 → 2026-08-18; 728 return observations)
-
-Weights: SBILIFE 10%, EICHERMOT 25%, NESTLEIND 10%, ETERNAL 25%, GoldBeES 30% (Σw = 1). Initial investment ₹1,00,000.
-
-| | Constructed portfolio | Equal-weighted | NIFTY 50 |
-|---|---|---|---|
-| Final value | ₹2,41,709 | — | — |
-| Annualised return | 32.14% | 28.25% | 9.35% |
-| Annualised σ | 17.75% | 16.47% | 13.35% |
-| Return/Risk | 1.81 | 1.72 | 0.70 |
-| Correlation to NIFTY 50 | 0.55 | 0.61 | 1.00 |
-
-*(This is an ex-post, in-sample illustration over a single favourable window — see* [*Limitations*](#limitations)*.)*
 
 ---
 
