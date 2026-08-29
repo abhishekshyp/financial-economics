@@ -1,0 +1,1126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compare your Personal Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;450;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <!-- SheetJS: reads .xlsx and .csv uniformly, client-side (no upload leaves the browser). -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Chart.js: value-path chart for the valid portfolios. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+      /* ── design tokens: inherited from the Financial Economics course chassis ── */
+      :root {
+        --paper: #f1f3ef;
+        --panel: #fbfcfa;
+        --ink: #182129;
+        --ink-soft: #4a5760;
+        --ink-faint: #8b979e;
+        --line: #d7dcd4;
+        --line-strong: #c3cabf;
+        --teal: #0e7c66;
+        --teal-deep: #0a5a4a;
+        --amber: #b9822b;
+        --rust: #b0472b;
+        --blue: #3b6c8c;
+        --slate: #6b7a82;
+        --shadow:
+          0 1px 2px rgba(24, 33, 41, 0.05),
+          0 8px 30px -14px rgba(24, 33, 41, 0.18);
+        --radius: 4px;
+        --paper-grid:
+          repeating-linear-gradient(
+            0deg,
+            transparent 0 27px,
+            rgba(24, 33, 41, 0.035) 27px 28px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            transparent 0 27px,
+            rgba(24, 33, 41, 0.035) 27px 28px
+          );
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        background-image:
+          linear-gradient(var(--paper), var(--paper)), var(--paper-grid);
+        color: var(--ink);
+        font-family: "IBM Plex Sans", system-ui, sans-serif;
+        font-size: clamp(15px, 1.05vw, 17px);
+        line-height: 1.5;
+        letter-spacing: -0.005em;
+        -webkit-font-smoothing: antialiased;
+      }
+      .mono {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-feature-settings: "tnum" 1;
+      }
+      h1,
+      h2,
+      h3,
+      .disp {
+        font-family: "Fraunces", Georgia, serif;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      em {
+        font-style: italic;
+        color: var(--teal-deep);
+        font-weight: inherit;
+      }
+      a {
+        color: var(--teal-deep);
+      }
+
+      .wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: clamp(28px, 5vw, 60px) clamp(18px, 4vw, 48px) 120px;
+      }
+
+      /* ── masthead ── */
+      .eyebrow {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: "IBM Plex Mono";
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 10px;
+        margin-bottom: 22px;
+      }
+      .eyebrow .idx {
+        color: var(--ink-faint);
+      }
+      h1.title {
+        font-size: clamp(34px, 5.2vw, 58px);
+        line-height: 1.03;
+        margin: 0.1em 0 0.15em;
+      }
+      .lede {
+        color: var(--ink-soft);
+        font-size: clamp(15px, 1.25vw, 18px);
+        max-width: 66ch;
+        margin: 0 0 6px;
+      }
+
+      /* ── step scaffolding ── */
+      .step {
+        margin-top: clamp(26px, 4vw, 40px);
+      }
+      .step-head {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .step-num {
+        font-family: "IBM Plex Mono";
+        font-size: 13px;
+        font-weight: 600;
+        color: #fff;
+        background: var(--teal);
+        border-radius: 3px;
+        padding: 2px 9px;
+        letter-spacing: 0.02em;
+        flex: none;
+      }
+      .step.locked .step-num {
+        background: var(--line-strong);
+      }
+      .step.done .step-num {
+        background: var(--teal-deep);
+      }
+      .step-title {
+        font-size: clamp(19px, 2vw, 25px);
+        margin: 0;
+      }
+      .step.locked {
+        opacity: 0.5;
+        pointer-events: none;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: clamp(16px, 2.2vw, 26px);
+      }
+      .hint {
+        color: var(--ink-soft);
+        font-size: 14px;
+        margin: 0 0 14px;
+        max-width: 70ch;
+      }
+
+      /* ── drop / file input ── */
+      .drop {
+        border: 1.5px dashed var(--line-strong);
+        border-radius: var(--radius);
+        padding: 22px;
+        text-align: center;
+        transition:
+          border-color 0.15s,
+          background 0.15s;
+        cursor: pointer;
+        background: rgba(14, 124, 102, 0.015);
+      }
+      .drop:hover,
+      .drop.over {
+        border-color: var(--teal);
+        background: rgba(14, 124, 102, 0.05);
+      }
+      .drop .big {
+        font-family: "Fraunces";
+        font-size: 17px;
+      }
+      .drop .sub {
+        color: var(--ink-faint);
+        font-size: 13px;
+        margin-top: 4px;
+        font-family: "IBM Plex Mono";
+      }
+      .drop input {
+        display: none;
+      }
+      .filetag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 12px;
+        font-family: "IBM Plex Mono";
+        font-size: 13px;
+        color: var(--teal-deep);
+        background: rgba(14, 124, 102, 0.08);
+        border: 1px solid rgba(14, 124, 102, 0.25);
+        border-radius: var(--radius);
+        padding: 5px 11px;
+      }
+
+      /* ── buttons ── */
+      .btnrow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        margin-top: 16px;
+      }
+      .btn {
+        font-family: "IBM Plex Mono";
+        font-size: 14px;
+        letter-spacing: 0.01em;
+        border: 1px solid var(--line-strong);
+        background: #fff;
+        color: var(--ink);
+        border-radius: var(--radius);
+        padding: 10px 17px;
+        cursor: pointer;
+        transition:
+          border-color 0.14s,
+          color 0.14s,
+          background 0.14s,
+          transform 0.05s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn:hover:not(:disabled) {
+        border-color: var(--teal);
+        color: var(--teal-deep);
+      }
+      .btn:active:not(:disabled) {
+        transform: translateY(1px);
+      }
+      .btn.teal {
+        background: var(--teal);
+        border-color: var(--teal);
+        color: #fff;
+      }
+      .btn.teal:hover:not(:disabled) {
+        background: var(--teal-deep);
+        border-color: var(--teal-deep);
+        color: #fff;
+      }
+      .btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+
+      /* ── callouts ── */
+      .callout {
+        color: var(--teal-deep);
+        background: rgba(14, 124, 102, 0.07);
+        border: 1px solid rgba(14, 124, 102, 0.25);
+        border-radius: var(--radius);
+        padding: 11px 14px;
+        margin-top: 14px;
+        font-size: 14px;
+      }
+      .callout.warn {
+        color: var(--rust);
+        background: rgba(176, 71, 43, 0.07);
+        border-color: rgba(176, 71, 43, 0.28);
+      }
+      .callout.amber {
+        color: var(--amber);
+        background: rgba(185, 130, 43, 0.08);
+        border-color: rgba(185, 130, 43, 0.3);
+      }
+      .callout b {
+        color: inherit;
+      }
+      .callout ul {
+        margin: 8px 0 0;
+        padding-left: 20px;
+      }
+      .callout li {
+        margin: 3px 0;
+      }
+
+      /* ── tables ── */
+      .tblwrap {
+        overflow-x: auto;
+        margin-top: 16px;
+      }
+      table.tbl {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: clamp(13px, 1.05vw, 15px);
+      }
+      table.tbl th,
+      table.tbl td {
+        text-align: right;
+        padding: 9px 13px;
+        border-bottom: 1px solid var(--line);
+        white-space: nowrap;
+      }
+      table.tbl th:first-child,
+      table.tbl td:first-child {
+        text-align: left;
+      }
+      table.tbl th {
+        font-family: "IBM Plex Mono";
+        font-size: 11px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        font-weight: 500;
+        border-bottom: 1px solid var(--line-strong);
+      }
+      table.tbl td.num {
+        font-family: "IBM Plex Mono";
+        font-feature-settings: "tnum" 1;
+      }
+      table.tbl tr.rank1 td {
+        background: rgba(14, 124, 102, 0.06);
+      }
+      table.tbl td .pos {
+        color: var(--teal-deep);
+      }
+      table.tbl td .neg {
+        color: var(--rust);
+      }
+      .pill {
+        font-family: "IBM Plex Mono";
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 999px;
+      }
+      .pill.ok {
+        color: var(--teal-deep);
+        background: rgba(14, 124, 102, 0.1);
+      }
+      .pill.no {
+        color: var(--rust);
+        background: rgba(176, 71, 43, 0.1);
+      }
+
+      /* ── method / formulas ── */
+      .formula {
+        font-family: "IBM Plex Mono";
+        background: rgba(24, 33, 41, 0.04);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 9px 13px;
+        font-size: 14px;
+        display: block;
+        margin: 8px 0;
+        overflow-x: auto;
+      }
+      details.method {
+        margin-top: 30px;
+      }
+      details.method > summary {
+        cursor: pointer;
+        font-family: "IBM Plex Mono";
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        padding: 10px 0;
+        border-top: 1px solid var(--line);
+      }
+      details.method .mbody {
+        color: var(--ink-soft);
+        font-size: 14.5px;
+        max-width: 76ch;
+      }
+      details.method .mbody h3 {
+        font-size: 16px;
+        color: var(--ink);
+        margin: 18px 0 6px;
+      }
+      details.method .mbody b {
+        color: var(--ink);
+      }
+
+      .chartwrap {
+        position: relative;
+        width: 100%;
+        height: clamp(260px, 42vh, 420px);
+        margin-top: 20px;
+      }
+      .chart-cap {
+        font-size: 13px;
+        color: var(--ink-soft);
+        margin: 4px 0 0;
+      }
+
+      .foot {
+        margin-top: 40px;
+        padding-top: 14px;
+        border-top: 1px solid var(--line);
+        font-family: "IBM Plex Mono";
+        font-size: 12px;
+        color: var(--ink-faint);
+      }
+      .spin {
+        display: inline-block;
+        width: 13px;
+        height: 13px;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: sp 0.7s linear infinite;
+      }
+      @keyframes sp {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .hide {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="eyebrow">
+        <span
+          >Financial Economics · Week 4 — Build Your Personal Portfolio</span
+        >
+        <span class="idx">Fund manager's console</span>
+      </div>
+      <h1 class="title">Compare your Personal Portfolio</h1>
+      <p class="lede">
+        Upload the class weights sheet and the price history. The console
+        validates each submission against the mandate —
+        <em>exactly 25 names, weights summing to 100%</em> — then deploys a
+        notional <b>₹1,00,00,000</b> per student and ranks the funds by their
+        final value, with absolute return, CAGR, annualised risk, and
+        reward-per-unit-of-risk.
+      </p>
+
+      <!-- ─────────────── STEP 1 ─────────────── -->
+      <section class="step done" id="step1">
+        <div class="step-head">
+          <span class="step-num">1</span>
+          <h2 class="step-title">Upload portfolio weights</h2>
+        </div>
+        <div class="panel">
+          <p class="hint">
+            First column = <b>stock symbols</b>; every following column = one
+            student (<span class="mono">ID_Name</span>) holding the
+            <b>weight in %</b> for each symbol. Blank cell = not held. Accepts
+            <span class="mono">.xlsx</span> or <span class="mono">.csv</span>.
+          </p>
+          <label class="drop" id="drop1">
+            <div class="big">
+              Drop the weights file here, or click to browse
+            </div>
+            <div class="sub">studentsStockPortfolio.xlsx</div>
+            <input type="file" id="file1" accept=".xlsx,.xls,.csv" />
+          </label>
+          <div id="tag1"></div>
+          <div class="btnrow">
+            <button class="btn teal" id="run1" disabled>
+              Validate portfolios
+            </button>
+          </div>
+          <div id="report1"></div>
+        </div>
+      </section>
+
+      <!-- ─────────────── STEP 2 ─────────────── -->
+      <section class="step locked" id="step2">
+        <div class="step-head">
+          <span class="step-num">2</span>
+          <h2 class="step-title">Upload price history &amp; compute</h2>
+        </div>
+        <div class="panel">
+          <p class="hint">
+            First column = <b>date</b>; every following column = a stock symbol
+            with its <b>daily price</b> (oldest date first). Only the students
+            who passed Step 1 are scored. Accepts
+            <span class="mono">.xlsx</span> or <span class="mono">.csv</span>.
+          </p>
+          <label class="drop" id="drop2">
+            <div class="big">Drop the price file here, or click to browse</div>
+            <div class="sub">historicalStockReturns.csv (price levels)</div>
+            <input type="file" id="file2" accept=".xlsx,.xls,.csv" />
+          </label>
+          <div id="tag2"></div>
+          <div class="btnrow">
+            <button class="btn teal" id="run2" disabled>
+              Compute performance
+            </button>
+          </div>
+          <div id="report2"></div>
+        </div>
+      </section>
+
+      <!-- ─────────────── RESULTS ─────────────── -->
+      <section class="step hide" id="step3">
+        <div class="step-head">
+          <span class="step-num">3</span>
+          <h2 class="step-title">Fund ranking</h2>
+        </div>
+        <div class="panel">
+          <div id="resultMeta" class="hint"></div>
+          <div class="tblwrap"><table class="tbl" id="resultTbl"></table></div>
+          <div class="btnrow">
+            <button class="btn" id="download">Download ranking (CSV)</button>
+          </div>
+          <div class="chartwrap"><canvas id="valueChart"></canvas></div>
+          <p class="chart-cap">
+            Notional fund value under buy-and-hold from the ₹1 crore starting
+            line. The steepest terminal line is the top of the table.
+          </p>
+        </div>
+      </section>
+
+      <!-- ─────────────── METHOD ─────────────── -->
+      <details class="method">
+        <summary>Method &amp; assumptions</summary>
+        <div class="mbody">
+          <h3>Validation</h3>
+          A submission is valid only if it holds <b>exactly 25</b> stocks with a
+          weight and its weights <b>sum to 100%</b> after rounding to zero
+          decimals (<span class="mono">round(Σwᵢ) = 100</span>). Anything else —
+          over- or under-count, or an off-100 sum — is excluded, and its reason
+          is reported before scoring proceeds. Weights are read as percentages.
+
+          <h3>Returns &amp; covariance (computed once, on all stocks)</h3>
+          Daily simple returns from the price levels:
+          <span class="formula">rᵢ,ₜ = Pᵢ,ₜ / Pᵢ,ₜ₋₁ − 1</span>
+          The full sample covariance matrix <b>Σ</b> of daily returns is built
+          once across every stock in the price file (sample estimator, ddof =
+          1), then each fund reuses the relevant block. This avoids recomputing
+          covariances per student.
+
+          <h3>Fund value — buy-and-hold from ₹1 crore</h3>
+          On day 1 each weight buys a fixed share count that is then held; the
+          portfolio value drifts with prices (no rebalancing, no cash, no
+          leverage — the realistic "deploy the capital" case):
+          <span class="formula"
+            >shareᵢ = wᵢ · 1cr / Pᵢ,₁ &nbsp;→&nbsp; Vₜ = Σᵢ shareᵢ · Pᵢ,ₜ</span
+          >
+
+          <h3>Reported metrics (2 d.p.)</h3>
+          <b>Absolute return</b> = V_last / 1cr − 1. &nbsp; <b>CAGR</b> =
+          (V_last / 1cr)^(1/years) − 1, with years = (last date − first date) /
+          365.25 (calendar basis). &nbsp; <b>Annualised risk</b> is the ex-ante
+          portfolio volatility from the chosen weights:
+          <span class="formula">σₐ = √(wᵀ Σ w) · √252</span>
+          <b>Reward per unit of risk</b> = CAGR / σₐ. This mirrors the
+          assignment's return/risk objective; it is a growth-to-volatility
+          ratio, not a Sharpe ratio (no risk-free rate is subtracted).
+
+          <h3>Notes</h3>
+          The value path uses realised buy-and-hold drift while risk uses the
+          fixed target weights, so the ratio pairs a realised return with an
+          ex-ante risk — standard for scoring a designed portfolio. Ranking is
+          by <b>final value</b>, per the brief; the CAGR/σ column exposes the
+          risk-adjusted ordering, which can differ.
+        </div>
+      </details>
+
+      <div class="foot">
+        Runs entirely in your browser · no file leaves this page · figures for
+        teaching only, not financial advice.
+      </div>
+    </div>
+
+    <script>
+      "use strict";
+      const $ = (id) => document.getElementById(id);
+      const CAP = 1e7; // ₹1 crore
+      const COL = {
+        teal: "#0e7c66",
+        amber: "#b9822b",
+        blue: "#3b6c8c",
+        rust: "#b0472b",
+        slate: "#6b7a82",
+        tealDeep: "#0a5a4a",
+        ink: "#182129",
+        line: "#d7dcd4",
+      };
+      const LINE_COLORS = [
+        COL.teal,
+        COL.amber,
+        COL.blue,
+        COL.rust,
+        COL.slate,
+        COL.tealDeep,
+        "#7a5c9e",
+        "#2f7d7d",
+        "#a6683a",
+        "#4a5760",
+      ];
+
+      // shared state
+      let weightsGrid = null; // array-of-arrays from the weights file
+      let validStudents = null; // [{name, held:{sym:pct}}]
+      let priceGrid = null;
+      let lastResults = null;
+      let chart = null;
+
+      /* ── helpers ── */
+      const toNum = (v) => {
+        if (v === null || v === undefined || v === "") return NaN;
+        if (typeof v === "number") return v;
+        const s = String(v)
+          .replace(/,/g, "")
+          .replace(/%/g, "")
+          .replace(/"/g, "")
+          .trim();
+        if (s === "") return NaN;
+        const n = parseFloat(s);
+        return isNaN(n) ? NaN : n;
+      };
+      const fmtINR = (x) =>
+        "₹" +
+        x.toLocaleString("en-IN", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      const pct = (x) => (x * 100).toFixed(2) + "%";
+      const signSpan = (x, txt) =>
+        `<span class="${x >= 0 ? "pos" : "neg"}">${txt}</span>`;
+
+      function parseDate(v) {
+        if (v instanceof Date && !isNaN(v)) return v;
+        if (typeof v === "number") {
+          // Excel serial
+          const d = new Date(Math.round((v - 25569) * 86400 * 1000));
+          return isNaN(d) ? null : d;
+        }
+        const s = String(v).trim();
+        let m = s.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/); // DD-MM-YYYY
+        if (m) return new Date(+m[3], +m[2] - 1, +m[1]);
+        m = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/); // YYYY-MM-DD
+        if (m) return new Date(+m[1], +m[2] - 1, +m[3]);
+        const d = new Date(s);
+        return isNaN(d) ? null : d;
+      }
+
+      function readFile(file) {
+        return new Promise((resolve, reject) => {
+          const rd = new FileReader();
+          rd.onerror = () => reject(new Error("Could not read the file."));
+          rd.onload = (e) => {
+            try {
+              const wb = XLSX.read(e.target.result, {
+                type: "array",
+                cellDates: true,
+              });
+              const ws = wb.Sheets[wb.SheetNames[0]];
+              const grid = XLSX.utils.sheet_to_json(ws, {
+                header: 1,
+                raw: true,
+                defval: null,
+                blankrows: false,
+              });
+              resolve(grid);
+            } catch (err) {
+              reject(err);
+            }
+          };
+          rd.readAsArrayBuffer(file);
+        });
+      }
+
+      /* ── generic drop/browse wiring ── */
+      function wireDrop(dropId, inputId, onFile) {
+        const drop = $(dropId),
+          input = $(inputId);
+        input.addEventListener("change", () => {
+          if (input.files[0]) onFile(input.files[0]);
+        });
+        ["dragenter", "dragover"].forEach((ev) =>
+          drop.addEventListener(ev, (e) => {
+            e.preventDefault();
+            drop.classList.add("over");
+          }),
+        );
+        ["dragleave", "drop"].forEach((ev) =>
+          drop.addEventListener(ev, (e) => {
+            e.preventDefault();
+            drop.classList.remove("over");
+          }),
+        );
+        drop.addEventListener("drop", (e) => {
+          const f = e.dataTransfer.files[0];
+          if (f) {
+            input.files = e.dataTransfer.files;
+            onFile(f);
+          }
+        });
+      }
+      const tagFile = (id, name) => {
+        $(id).innerHTML = `<span class="filetag">✓ ${name}</span>`;
+      };
+
+      /* ─────────────── STEP 1: load + validate weights ─────────────── */
+      wireDrop("drop1", "file1", async (f) => {
+        try {
+          weightsGrid = await readFile(f);
+          tagFile("tag1", f.name);
+          $("run1").disabled = false;
+          $("report1").innerHTML = "";
+        } catch (err) {
+          $("report1").innerHTML =
+            `<div class="callout warn"><b>Couldn't read that file.</b> ${err.message}</div>`;
+        }
+      });
+
+      $("run1").addEventListener("click", () => {
+        if (!weightsGrid || weightsGrid.length < 2) {
+          $("report1").innerHTML =
+            `<div class="callout warn">The weights sheet looks empty.</div>`;
+          return;
+        }
+        const header = weightsGrid[0];
+        const students = header.slice(1).map((h, i) => ({
+          name: h == null ? `Column ${i + 2}` : String(h),
+          col: i + 1,
+        }));
+        const symbols = [];
+        for (let r = 1; r < weightsGrid.length; r++) {
+          const s = weightsGrid[r][0];
+          if (s != null && String(s).trim() !== "")
+            symbols.push({ sym: String(s).trim(), row: r });
+        }
+
+        const passed = [],
+          failed = [],
+          allRows = [];
+        students.forEach((st) => {
+          const held = {};
+          symbols.forEach(({ sym, row }) => {
+            const v = toNum(weightsGrid[row][st.col]);
+            if (!isNaN(v) && v !== 0) held[sym] = v;
+          });
+          const count = Object.keys(held).length;
+          const sum = Object.values(held).reduce((a, b) => a + b, 0);
+          const reasons = [];
+          if (count !== 25)
+            reasons.push(
+              `holds ${count} stock${count === 1 ? "" : "s"} (needs exactly 25)`,
+            );
+          if (Math.round(sum) !== 100)
+            reasons.push(`weights sum to ${+sum.toFixed(2)}% (needs 100%)`);
+          const ok = reasons.length === 0;
+          allRows.push({ name: st.name, count, sum, ok, reasons });
+          if (ok) passed.push({ name: st.name, held });
+          else failed.push({ name: st.name, reasons });
+        });
+
+        validStudents = passed;
+
+        // ── render the full validation ledger ──
+        let html = `<div class="tblwrap"><table class="tbl">
+          <thead><tr><th>Student</th><th># Stocks</th><th>Σ Weights</th><th>Status</th></tr></thead><tbody>`;
+        allRows.forEach((r) => {
+          html += `<tr>
+            <td>${r.name}</td>
+            <td class="num">${r.count}</td>
+            <td class="num">${+r.sum.toFixed(2)}%</td>
+            <td>${r.ok ? '<span class="pill ok">PASS</span>' : '<span class="pill no">EXCLUDED</span>'}</td>
+          </tr>`;
+        });
+        html += `</tbody></table></div>`;
+
+        if (failed.length) {
+          html += `<div class="callout warn"><b>Excluded before scoring (${failed.length}):</b><ul>`;
+          failed.forEach((f) => {
+            html += `<li><b>${f.name}</b> — ${f.reasons.join("; ")}.</li>`;
+          });
+          html += `</ul></div>`;
+        }
+
+        if (passed.length === 0) {
+          html += `<div class="callout warn">No submission passed validation — nothing to score.</div>`;
+          $("report1").innerHTML = html;
+          lockStep2(true);
+          return;
+        }
+
+        html += `<div class="callout"><b>${passed.length}</b> submission${passed.length === 1 ? "" : "s"} passed and will be deployed in Step 2.</div>`;
+        $("report1").innerHTML = html;
+        lockStep2(false);
+      });
+
+      function lockStep2(locked) {
+        $("step2").classList.toggle("locked", locked);
+        if (locked) {
+          $("step3").classList.add("hide");
+        }
+      }
+
+      /* ─────────────── STEP 2: load prices + compute ─────────────── */
+      wireDrop("drop2", "file2", async (f) => {
+        try {
+          priceGrid = await readFile(f);
+          tagFile("tag2", f.name);
+          $("run2").disabled = false;
+          $("report2").innerHTML = "";
+        } catch (err) {
+          $("report2").innerHTML =
+            `<div class="callout warn"><b>Couldn't read that file.</b> ${err.message}</div>`;
+        }
+      });
+
+      $("run2").addEventListener("click", () => {
+        const btn = $("run2");
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spin"></span> Computing…';
+        // let the spinner paint before the heavy loop
+        setTimeout(() => {
+          try {
+            compute();
+          } catch (err) {
+            $("report2").innerHTML =
+              `<div class="callout warn"><b>Computation failed.</b> ${err.message}</div>`;
+          } finally {
+            btn.disabled = false;
+            btn.textContent = "Compute performance";
+          }
+        }, 30);
+      });
+
+      function compute() {
+        if (!priceGrid || priceGrid.length < 3)
+          throw new Error(
+            "The price file needs at least a header and two dated rows.",
+          );
+
+        // header → symbol columns (skip date col 0)
+        const pHeader = priceGrid[0];
+        const colOf = {}; // symbol -> column index in price grid
+        for (let c = 1; c < pHeader.length; c++) {
+          const s = pHeader[c];
+          if (s != null && String(s).trim() !== "") colOf[String(s).trim()] = c;
+        }
+        const priceSyms = Object.keys(colOf);
+        const N = priceSyms.length;
+        const symPos = {};
+        priceSyms.forEach((s, i) => (symPos[s] = i)); // symbol -> dense index
+
+        // build dense price matrix P (T × N) and the date column
+        const dates = [],
+          P = [];
+        for (let r = 1; r < priceGrid.length; r++) {
+          const row = priceGrid[r];
+          if (row[0] == null || String(row[0]).trim() === "") continue;
+          const prow = new Array(N);
+          let good = true;
+          for (let i = 0; i < N; i++) {
+            const v = toNum(row[colOf[priceSyms[i]]]);
+            if (isNaN(v)) {
+              good = false;
+              break;
+            }
+            prow[i] = v;
+          }
+          if (!good) continue;
+          dates.push(parseDate(row[0]));
+          P.push(prow);
+        }
+        const T = P.length;
+        if (T < 3)
+          throw new Error("Too few valid price rows to compute returns.");
+
+        // any held symbol missing from the price file?
+        const missing = new Set();
+        validStudents.forEach((st) =>
+          Object.keys(st.held).forEach((s) => {
+            if (!(s in colOf)) missing.add(s);
+          }),
+        );
+
+        // years (calendar); fall back to trading-day basis if dates unparseable
+        let years, yearsNote;
+        const d0 = dates[0],
+          dL = dates[T - 1];
+        if (d0 && dL && dL > d0) {
+          years = (dL - d0) / (365.25 * 86400 * 1000);
+          yearsNote = "calendar";
+        } else {
+          years = (T - 1) / 252;
+          yearsNote = "trading-day (dates unparseable)";
+        }
+
+        // ── daily simple returns R (T-1 × N) ──
+        const M = T - 1;
+        const R = new Array(M);
+        for (let t = 1; t < T; t++) {
+          const rr = new Array(N);
+          for (let i = 0; i < N; i++) rr[i] = P[t][i] / P[t - 1][i] - 1;
+          R[t - 1] = rr;
+        }
+
+        // ── covariance Σ, computed once across all N stocks (sample, ddof=1) ──
+        const mean = new Array(N).fill(0);
+        for (let t = 0; t < M; t++)
+          for (let i = 0; i < N; i++) mean[i] += R[t][i];
+        for (let i = 0; i < N; i++) mean[i] /= M;
+        // center
+        for (let t = 0; t < M; t++) {
+          const rr = R[t];
+          for (let i = 0; i < N; i++) rr[i] -= mean[i];
+        }
+        const Sigma = Array.from({ length: N }, () => new Float64Array(N));
+        for (let i = 0; i < N; i++) {
+          for (let j = i; j < N; j++) {
+            let s = 0;
+            for (let t = 0; t < M; t++) s += R[t][i] * R[t][j];
+            const cov = s / (M - 1);
+            Sigma[i][j] = cov;
+            Sigma[j][i] = cov;
+          }
+        }
+
+        // ── per-student metrics (reuse Σ) ──
+        const results = [];
+        validStudents.forEach((st) => {
+          const idx = [],
+            w = [];
+          let anyMissing = false;
+          for (const [sym, pctw] of Object.entries(st.held)) {
+            if (!(sym in colOf)) {
+              anyMissing = true;
+              continue;
+            }
+            idx.push(symPos[sym]);
+            w.push(pctw / 100);
+          }
+          // buy-and-hold value path
+          const shares = idx.map((k, m) => (w[m] * CAP) / P[0][k]);
+          const path = new Array(T);
+          for (let t = 0; t < T; t++) {
+            let v = 0;
+            for (let m = 0; m < idx.length; m++) v += shares[m] * P[t][idx[m]];
+            path[t] = v;
+          }
+          const final = path[T - 1];
+          const absRet = final / CAP - 1;
+          const cagr = Math.pow(final / CAP, 1 / years) - 1;
+          // ex-ante risk: wᵀ Σ w over the held block
+          let varD = 0;
+          for (let a = 0; a < idx.length; a++)
+            for (let b = 0; b < idx.length; b++)
+              varD += w[a] * w[b] * Sigma[idx[a]][idx[b]];
+          const sigA = Math.sqrt(Math.max(varD, 0)) * Math.sqrt(252);
+          results.push({
+            name: st.name,
+            final,
+            absRet,
+            cagr,
+            sigA,
+            ratio: cagr / sigA,
+            path,
+            incomplete: anyMissing,
+          });
+        });
+
+        results.sort((a, b) => b.ratio - a.ratio);
+        lastResults = {
+          results,
+          dates,
+          years,
+          yearsNote,
+          N,
+          T,
+          missing: [...missing],
+        };
+        renderResults();
+      }
+
+      /* ─────────────── render ─────────────── */
+      function renderResults() {
+        const { results, years, yearsNote, N, T, missing } = lastResults;
+        $("step3").classList.remove("hide");
+
+        let meta = `Covariance built once on <b>${N}</b>;
+        if (missing.length)
+          meta += `<br><span style="color:var(--rust)">⚠ ${missing.length} held symbol(s) absent from the price file were skipped: ${missing.join(", ")}.</span>`;
+        $("resultMeta").innerHTML = meta;
+
+        let html = `<thead><tr>
+          <th>#</th><th>Student</th><th>Final value</th><th>Abs. return</th>
+          <th>CAGR</th><th>Ann. σ</th><th>CAGR / σ</th></tr></thead><tbody>`;
+        const cutoffRatio = results[Math.min(2, results.length - 1)].ratio;
+        results.forEach((r, i) => {
+          const isTop3 = r.ratio >= cutoffRatio;
+          html += `<tr class="${isTop3 ? "rank1" : ""}">
+            <td class="num">${i + 1}</td>
+            <td>${r.name}${r.incomplete ? ' <span class="pill no">partial</span>' : ""}</td>
+            <td class="num">${fmtINR(r.final)}</td>
+            <td class="num">${signSpan(r.absRet, pct(r.absRet))}</td>
+            <td class="num">${signSpan(r.cagr, pct(r.cagr))}</td>
+            <td class="num">${(r.sigA * 100).toFixed(2)}%</td>
+            <td class="num">${r.ratio.toFixed(2)}</td>
+          </tr>`;
+        });
+        html += `</tbody>`;
+        $("resultTbl").innerHTML = html;
+
+        drawChart();
+        $("step3").scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      function drawChart() {
+        const { results, dates } = lastResults;
+        const labels = dates.map((d) =>
+          d
+            ? d.toLocaleDateString("en-IN", { month: "short", year: "2-digit" })
+            : "",
+        );
+        const datasets = results.map((r, i) => ({
+          label: r.name,
+          data: r.path,
+          borderColor: LINE_COLORS[i % LINE_COLORS.length],
+          backgroundColor: "transparent",
+          borderWidth: 2,
+          pointRadius: 0,
+          tension: 0.15,
+        }));
+        if (chart) chart.destroy();
+        chart = new Chart($("valueChart"), {
+          type: "line",
+          data: { labels, datasets },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: "index", intersect: false },
+            plugins: {
+              legend: {
+                labels: {
+                  font: { family: "'IBM Plex Mono'", size: 12 },
+                  boxWidth: 12,
+                  color: COL.slate,
+                },
+              },
+              tooltip: {
+                callbacks: {
+                  label: (c) =>
+                    `${c.dataset.label}: ₹${c.parsed.y.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`,
+                },
+              },
+            },
+            scales: {
+              x: {
+                grid: { color: COL.line },
+                ticks: {
+                  maxTicksLimit: 10,
+                  color: COL.slate,
+                  font: { family: "'IBM Plex Mono'", size: 11 },
+                },
+              },
+              y: {
+                grid: { color: COL.line },
+                ticks: {
+                  color: COL.slate,
+                  font: { family: "'IBM Plex Mono'", size: 11 },
+                  callback: (v) => "₹" + (v / 1e7).toFixed(2) + "cr",
+                },
+              },
+            },
+          },
+        });
+      }
+
+      /* ── download ── */
+      $("download").addEventListener("click", () => {
+        if (!lastResults) return;
+        const rows = [
+          [
+            "Rank",
+            "Student",
+            "FinalValue_INR",
+            "AbsoluteReturn_pct",
+            "CAGR_pct",
+            "AnnualisedStdev_pct",
+            "CAGR_to_Risk",
+          ],
+        ];
+        lastResults.results.forEach((r, i) =>
+          rows.push([
+            i + 1,
+            r.name,
+            r.final.toFixed(2),
+            (r.absRet * 100).toFixed(2),
+            (r.cagr * 100).toFixed(2),
+            (r.sigA * 100).toFixed(2),
+            r.ratio.toFixed(2),
+          ]),
+        );
+        const csv = rows
+          .map((r) =>
+            r
+              .map((c) =>
+                /[",\n]/.test(String(c))
+                  ? `"${String(c).replace(/"/g, '""')}"`
+                  : c,
+              )
+              .join(","),
+          )
+          .join("\n");
+        const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "portfolio_ranking.csv";
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    </script>
+  </body>
+</html>
