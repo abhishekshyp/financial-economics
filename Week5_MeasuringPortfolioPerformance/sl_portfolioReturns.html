@@ -1,0 +1,1747 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- ┌───────────────────────────────────────────────────────────────────┐
+         │  FINANCIAL ECONOMICS - SLIDE TEMPLATE                              │
+         │  Canonical chassis for every week's deck.                         │
+         │  To make a new deck: copy this file, edit the TITLE and THANK-YOU │
+         │  slides, then duplicate the "CONTENT SLIDE" block once per slide. │
+         │  Do NOT edit the CORE CHASSIS CSS or the ENGINE script - only add │
+         │  your own rules in the marked "DECK-SPECIFIC STYLES" section and  │
+         │  your own per-slide initializers in the marked initFns section.   │
+         └───────────────────────────────────────────────────────────────────┘ -->
+    <title>Different Ways to Calculate Portfolio Returns</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;450;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Chart.js is only needed if a slide draws charts; harmless to keep. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+      /* ══════════════════════════════════════════════════════════════════
+         CORE CHASSIS - shared design tokens + primitives (do not edit)
+         ══════════════════════════════════════════════════════════════════ */
+      :root {
+        --paper: #f1f3ef;
+        --panel: #fbfcfa;
+        --ink: #182129;
+        --ink-soft: #4a5760;
+        --ink-faint: #8b979e;
+        --line: #d7dcd4;
+        --line-strong: #c3cabf;
+        --teal: #0e7c66;
+        --teal-deep: #0a5a4a;
+        --amber: #b9822b;
+        --rust: #b0472b;
+        --blue: #3b6c8c;
+        --slate: #6b7a82;
+        --shadow:
+          0 1px 2px rgba(24, 33, 41, 0.05),
+          0 8px 30px -14px rgba(24, 33, 41, 0.18);
+        --radius: 4px;
+        --paper-grid:
+          repeating-linear-gradient(
+            0deg,
+            transparent 0 27px,
+            rgba(24, 33, 41, 0.035) 27px 28px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            transparent 0 27px,
+            rgba(24, 33, 41, 0.035) 27px 28px
+          );
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: "IBM Plex Sans", system-ui, sans-serif;
+        font-weight: 400;
+        /* Base type scale. Week 1 shipped clamp(14px,1.35vw,17px); the +2px
+           bump is the going-forward standard. To revert: clamp(14px,1.35vw,17px). */
+        font-size: clamp(16px, 1.4vw, 19px);
+        line-height: 1.5;
+        letter-spacing: -0.005em;
+        -webkit-font-smoothing: antialiased;
+        overflow: hidden;
+        background-image:
+          linear-gradient(var(--paper), var(--paper)), var(--paper-grid);
+      }
+      .mono {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-feature-settings: "tnum" 1;
+      }
+      h1,
+      h2,
+      h3,
+      .disp {
+        font-family: "Fraunces", Georgia, serif;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      em {
+        font-style: italic;
+        color: var(--teal-deep);
+        font-weight: inherit;
+      }
+      a {
+        color: var(--teal-deep);
+      }
+
+      /* deck shell */
+      .deck {
+        position: fixed;
+        inset: 0;
+      }
+      .slide {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(16px);
+        transition:
+          opacity 0.5s ease,
+          transform 0.5s ease,
+          visibility 0.5s;
+        overflow-y: auto;
+      }
+      .slide.active {
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+      }
+      .inner {
+        max-width: 1160px;
+        margin: 0 auto;
+        min-height: 100%;
+        padding: clamp(30px, 5.5vh, 66px) clamp(22px, 5vw, 74px)
+          clamp(64px, 8vh, 84px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .inner.top {
+        justify-content: flex-start;
+        padding-top: clamp(40px, 7vh, 78px);
+      }
+
+      /* eyebrow */
+      .eyebrow {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: "IBM Plex Mono";
+        font-size: 13px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 10px;
+        margin-bottom: clamp(16px, 3vh, 30px);
+      }
+      .eyebrow .idx {
+        color: var(--ink-faint);
+      }
+
+      /* headings + text */
+      h1.title {
+        font-size: clamp(46px, 8vw, 96px);
+        line-height: 1.02;
+        margin: 0.08em 0;
+      }
+      .title-sub {
+        font-family: "IBM Plex Mono";
+        font-size: clamp(13px, 1.3vw, 16px);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+      }
+      .title-meta {
+        margin-top: clamp(20px, 4vh, 48px);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .title-meta .who {
+        font-family: "Fraunces";
+        font-size: clamp(19px, 2vw, 25px);
+        font-weight: 600;
+      }
+      .title-meta .mail {
+        font-family: "IBM Plex Mono";
+        font-size: clamp(13px, 1.2vw, 15px);
+        color: var(--teal-deep);
+      }
+      .title-course {
+        font-family: "IBM Plex Mono";
+        font-size: clamp(13px, 1.2vw, 15px);
+        color: var(--ink-soft);
+        margin-top: 2px;
+      }
+      .kbd-hint {
+        margin-top: clamp(26px, 5vh, 56px);
+        font-family: "IBM Plex Mono";
+        font-size: 13px;
+        color: var(--ink-faint);
+      }
+      .kbd {
+        border: 1px solid var(--line-strong);
+        border-bottom-width: 2px;
+        border-radius: 4px;
+        padding: 1px 7px;
+        background: #fff;
+        color: var(--ink-soft);
+        margin: 0 1px;
+      }
+      .head {
+        font-size: clamp(27px, 3.7vw, 47px);
+        line-height: 1.1;
+        margin: 0 0 0.4em;
+      }
+      .head.wide {
+        max-width: 20ch;
+      }
+      .head.sm {
+        font-size: clamp(23px, 3vw, 37px);
+      }
+      .body {
+        color: var(--ink-soft);
+        font-size: clamp(15px, 1.45vw, 18px);
+        line-height: 1.55;
+        margin: 0 0 12px;
+        max-width: 62ch;
+      }
+      .body b,
+      .body strong {
+        color: var(--ink);
+      }
+
+      /* callouts */
+      .callout {
+        color: var(--teal-deep);
+        background: rgba(14, 124, 102, 0.07);
+        border: 1px solid rgba(14, 124, 102, 0.25);
+        border-radius: var(--radius);
+        padding: 10px 13px;
+        margin-top: 12px;
+        display: inline-block;
+        font-size: clamp(14px, 1.35vw, 17px);
+      }
+      .callout.warn {
+        color: var(--rust);
+        background: rgba(176, 71, 43, 0.07);
+        border-color: rgba(176, 71, 43, 0.28);
+      }
+      .callout.amber {
+        color: var(--amber);
+        background: rgba(185, 130, 43, 0.08);
+        border-color: rgba(185, 130, 43, 0.3);
+      }
+
+      /* panels + layout */
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: clamp(16px, 2vw, 24px);
+      }
+      .panel.grid {
+        background-image:
+          linear-gradient(var(--panel), var(--panel)),
+          repeating-linear-gradient(
+            0deg,
+            transparent 0 23px,
+            rgba(24, 33, 41, 0.028) 23px 24px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            transparent 0 23px,
+            rgba(24, 33, 41, 0.028) 23px 24px
+          );
+        background-clip: padding-box;
+      }
+      .two {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(18px, 3vw, 44px);
+        align-items: center;
+      }
+      .two.rail {
+        grid-template-columns: 0.92fr 1.08fr;
+      }
+      .two.railL {
+        grid-template-columns: 1.08fr 0.92fr;
+      }
+      @media (max-width: 880px) {
+        .two,
+        .two.rail,
+        .two.railL {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* charts */
+      .chartwrap {
+        position: relative;
+        width: 100%;
+        height: clamp(240px, 40vh, 420px);
+      }
+      .chartwrap.sm {
+        height: clamp(200px, 30vh, 300px);
+      }
+      .chartwrap canvas {
+        max-width: 100% !important;
+      }
+      .chart-h {
+        font-size: clamp(15px, 1.6vw, 19px);
+        font-weight: 600;
+        margin: 0 0 2px;
+      }
+      .chart-cap {
+        font-size: clamp(12px, 1.15vw, 14px);
+        color: var(--ink-soft);
+        margin: 0 0 12px;
+        line-height: 1.45;
+      }
+
+      /* buttons */
+      .btn {
+        font-family: "IBM Plex Mono";
+        font-size: 14px;
+        letter-spacing: 0.01em;
+        border: 1px solid var(--line-strong);
+        background: #fff;
+        color: var(--ink);
+        border-radius: var(--radius);
+        padding: 10px 17px;
+        cursor: pointer;
+        transition:
+          border-color 0.14s,
+          color 0.14s,
+          background 0.14s,
+          transform 0.05s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn:hover {
+        border-color: var(--teal);
+        color: var(--teal-deep);
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+      .btn.teal {
+        background: var(--teal);
+        border-color: var(--teal);
+        color: #fff;
+      }
+      .btn.teal:hover {
+        background: var(--teal-deep);
+        color: #fff;
+        border-color: var(--teal-deep);
+      }
+      .btn.ghost {
+        background: transparent;
+      }
+      .btnrow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        margin-top: 4px;
+      }
+
+      /* sliders */
+      .ctrl {
+        margin: 12px 0;
+      }
+      .ctrl label {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        font-size: 14px;
+        color: var(--ink-soft);
+        margin-bottom: 5px;
+      }
+      .ctrl label .v {
+        font-family: "IBM Plex Mono";
+        font-weight: 600;
+        color: var(--teal-deep);
+        font-size: 15px;
+      }
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 4px;
+        border-radius: 3px;
+        background: var(--line-strong);
+        outline: none;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 17px;
+        height: 17px;
+        border-radius: 50%;
+        background: var(--teal);
+        border: 2px solid var(--panel);
+        box-shadow: var(--shadow);
+        cursor: pointer;
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 17px;
+        height: 17px;
+        border-radius: 50%;
+        background: var(--teal);
+        border: 2px solid var(--panel);
+        cursor: pointer;
+      }
+
+      /* readouts + tables + formula */
+      .bigval {
+        font-family: "IBM Plex Mono";
+        font-weight: 600;
+        font-size: clamp(30px, 4.4vw, 52px);
+        line-height: 1;
+      }
+      .bigval.pos {
+        color: var(--teal-deep);
+      }
+      .bigval.neg {
+        color: var(--rust);
+      }
+      .subval {
+        font-size: 13px;
+        color: var(--ink-faint);
+        margin-top: 6px;
+      }
+      .formula {
+        font-family: "IBM Plex Mono";
+        background: rgba(24, 33, 41, 0.04);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 10px 14px;
+        font-size: clamp(14px, 1.5vw, 17px);
+        display: inline-block;
+        margin: 6px 0;
+      }
+      table.tbl {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: clamp(13px, 1.35vw, 16px);
+      }
+      table.tbl th,
+      table.tbl td {
+        text-align: right;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--line);
+      }
+      table.tbl th:first-child,
+      table.tbl td:first-child {
+        text-align: left;
+      }
+      table.tbl th {
+        font-family: "IBM Plex Mono";
+        font-size: 12px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        font-weight: 500;
+      }
+
+      /* card grid */
+      .cards {
+        display: grid;
+        gap: 12px;
+      }
+      .cards.c2 {
+        grid-template-columns: 1fr 1fr;
+      }
+      .cards.c3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      @media (max-width: 820px) {
+        .cards.c3,
+        .cards.c2 {
+          grid-template-columns: 1fr;
+        }
+      }
+      .rcard {
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--teal);
+        border-radius: var(--radius);
+        background: var(--panel);
+        padding: 13px 15px;
+        box-shadow: var(--shadow);
+      }
+      .rcard.c-amber {
+        border-left-color: var(--amber);
+      }
+      .rcard.c-rust {
+        border-left-color: var(--rust);
+      }
+      .rcard.c-blue {
+        border-left-color: var(--blue);
+      }
+      .rcard.c-slate {
+        border-left-color: var(--slate);
+      }
+      .rcard .n {
+        font-family: "IBM Plex Mono";
+        font-size: 11.5px;
+        color: var(--ink-faint);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      .rcard h4 {
+        font-family: "Fraunces";
+        font-size: clamp(16px, 1.7vw, 19px);
+        margin: 4px 0 4px;
+      }
+      .rcard p {
+        margin: 0;
+        font-size: clamp(13px, 1.3vw, 15px);
+        color: var(--ink-soft);
+        line-height: 1.45;
+      }
+
+      /* references (thank-you slide) */
+      .refs {
+        margin-top: clamp(22px, 4vh, 40px);
+        font-size: clamp(12px, 1.2vw, 14px);
+        color: var(--ink-soft);
+        line-height: 1.7;
+        max-width: 74ch;
+        border-top: 1px solid var(--line);
+        padding-top: 16px;
+      }
+      .refs b {
+        color: var(--ink);
+      }
+
+      /* ── chrome: progress + nav + overview (canonical Week 1 style) ── */
+      #progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        background: var(--teal);
+        width: 0;
+        z-index: 40;
+        transition: width 0.4s ease;
+      }
+      #nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 clamp(14px, 3vw, 40px);
+        z-index: 40;
+        pointer-events: none;
+      }
+      #nav .slug {
+        font-family: "IBM Plex Mono";
+        font-size: 11.5px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-faint);
+        pointer-events: auto;
+      }
+      #nav .ctrls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        pointer-events: auto;
+      }
+      #nav .ctrls .count {
+        font-family: "IBM Plex Mono";
+        font-size: 13px;
+        color: var(--ink-soft);
+        min-width: 66px;
+        text-align: center;
+      }
+      #nav button {
+        width: 34px;
+        height: 34px;
+        border-radius: var(--radius);
+        border: 1px solid var(--line-strong);
+        background: var(--panel);
+        color: var(--ink-soft);
+        cursor: pointer;
+        font-size: 15px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          background 0.12s,
+          color 0.12s,
+          border-color 0.12s;
+      }
+      #nav button:hover {
+        background: #fff;
+        color: var(--ink);
+        border-color: var(--ink);
+      }
+      #nav button:focus-visible {
+        outline: 2px solid var(--teal);
+        outline-offset: 2px;
+      }
+      #overview {
+        position: fixed;
+        inset: 0;
+        background: rgba(241, 243, 239, 0.97);
+        z-index: 60;
+        display: none;
+        padding: clamp(24px, 5vh, 60px) clamp(20px, 5vw, 70px);
+        overflow-y: auto;
+      }
+      #overview.on {
+        display: block;
+      }
+      #overview h3 {
+        font-family: "Fraunces";
+        font-size: clamp(18px, 2.4vw, 26px);
+        margin: 0 0 18px;
+      }
+      .ovgrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+        gap: 12px;
+      }
+      .ovcell {
+        text-align: left;
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--line-strong);
+        border-radius: var(--radius);
+        background: var(--panel);
+        padding: 12px 14px;
+        cursor: pointer;
+        transition:
+          border-color 0.12s,
+          box-shadow 0.12s;
+        font: inherit;
+      }
+      .ovcell:hover {
+        border-left-color: var(--teal);
+        box-shadow: var(--shadow);
+      }
+      .ovcell.here {
+        border-left-color: var(--teal);
+      }
+      .ovcell .on {
+        font-family: "IBM Plex Mono";
+        font-size: 11px;
+        color: var(--teal-deep);
+        letter-spacing: 0.12em;
+      }
+      .ovcell .ot {
+        font-size: 14px;
+        color: var(--ink);
+        margin-top: 4px;
+        line-height: 1.3;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .slide {
+          transition: opacity 0.2s;
+          transform: none !important;
+        }
+        #progress {
+          transition: none;
+        }
+      }
+      @media print {
+        body {
+          overflow: visible;
+          background: #fff;
+        }
+        #progress,
+        #nav,
+        #overview {
+          display: none !important;
+        }
+        .slide {
+          position: relative;
+          opacity: 1 !important;
+          visibility: visible !important;
+          transform: none !important;
+          page-break-after: always;
+          min-height: 100vh;
+        }
+        .inner {
+          justify-content: flex-start;
+          padding-top: 40px;
+        }
+      }
+
+      /* ══════════════════════════════════════════════════════════════════
+         DECK-SPECIFIC STYLES - add this deck's one-off components below
+         ══════════════════════════════════════════════════════════════════ */
+      /* e.g. .quizrow { ... }   .timer { ... }   .lesson { ... } */
+      .fx {
+        font-family: "IBM Plex Mono";
+        background: rgba(24, 33, 41, 0.04);
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--teal);
+        border-radius: var(--radius);
+        padding: 12px 15px;
+        font-size: clamp(14px, 1.6vw, 19px);
+        line-height: 1.5;
+        margin: 9px 0;
+        color: var(--ink);
+      }
+      .fx small { color: var(--ink-soft); font-size: 0.72em; }
+      .fx .op { color: var(--teal-deep); }
+      .sym { font-family: "IBM Plex Mono"; color: var(--teal-deep); font-weight: 600; }
+      .tag {
+        display: inline-block;
+        font-family: "IBM Plex Mono";
+        font-size: 10.5px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 2px 8px;
+        border-radius: 100px;
+        border: 1px solid var(--line-strong);
+        color: var(--ink-soft);
+        background: #fff;
+        margin-right: 7px;
+        vertical-align: 1px;
+      }
+      .tag.teal { color: var(--teal-deep); border-color: rgba(14, 124, 102, 0.35); background: rgba(14, 124, 102, 0.07); }
+      .tag.rust { color: var(--rust); border-color: rgba(176, 71, 43, 0.35); background: rgba(176, 71, 43, 0.07); }
+      .tag.amber { color: var(--amber); border-color: rgba(185, 130, 43, 0.35); background: rgba(185, 130, 43, 0.08); }
+      .bias { font-size: clamp(13px, 1.35vw, 15.5px); color: var(--ink-soft); margin: 8px 0; }
+      .metric { border-top: 1px solid var(--line); padding-top: 10px; margin-top: 10px; }
+      .metric .lab { font-size: 13px; color: var(--ink-faint); }
+      .mrow { display: flex; gap: 26px; flex-wrap: wrap; }
+      table.tbl.compact th, table.tbl.compact td { padding: 6px 10px; font-size: clamp(12px, 1.2vw, 14.5px); }
+      table.tbl td.lft, table.tbl th.lft { text-align: left; }
+    </style>
+  </head>
+  <body>
+    <div id="progress"></div>
+    <div class="deck" id="deck">
+      <!-- ══════════════════ 01 · TITLE (edit the 4 fields) ══════════════════ -->
+      <section class="slide" data-slug="Title">
+        <div class="inner">
+          <div class="eyebrow">
+            <span>Financial Economics Tutorial</span><span class="idx">01</span>
+          </div>
+          <div class="title-sub">Portfolio Returns</div>
+          <h1 class="title">Different Ways to Calculate<br /><em>Portfolio Returns</em></h1>
+          <p
+            class="body"
+            style="max-width: 52ch; margin-top: 14px; font-size: clamp(15px, 1.5vw, 19px)"
+          >
+            Ten return measures, each with its formula, the bias it carries, and
+            the situation it fits.
+          </p>
+          <div class="title-meta">
+            <span class="who">Abhishek Kashyap</span>
+            <span class="title-course">Financial Economics Tutorial</span>
+            <span class="mail">abhishek_k@hs.iitr.ac.in</span>
+          </div>
+          <div class="kbd-hint">
+            Navigate with <span class="kbd">←</span>
+            <span class="kbd">→</span> · overview <span class="kbd">O</span> ·
+            fullscreen <span class="kbd">F</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════ 02 · CASE STUDY ══════════════════ -->
+      <section class="slide" data-slug="Case study: IITR AIF">
+        <div class="inner top">
+          <div class="eyebrow"><span>Case study · IITR Startup AIF</span><span class="idx">02</span></div>
+          <h2 class="head sm">Did the IITR AIF <em>create value?</em></h2>
+          <div class="two" style="align-items: start; margin-top: 6px">
+            <div>
+              <p class="body">
+                You manage the <b>IITR Startup AIF</b>, investing in startups
+                emerging from the IIT Roorkee ecosystem. After five years, the
+                Investment Committee asks you to present the fund's performance.
+              </p>
+              <p class="body" style="margin-bottom: 4px">
+                <span class="tag teal">Benchmark</span>Nifty Next 50.
+              </p>
+              <div class="fx" style="border-left-color: var(--rust)">
+                Investment Committee: "Did our AIF actually outperform the Nifty
+                Next 50 over these five years?"
+              </div>
+              <p class="body" style="font-size: clamp(13px,1.35vw,15.5px)">
+                The cash flows are dated and unequal, and the question is
+                benchmark-relative. Answering it draws on several of the measures
+                that follow: XIRR for the fund's own return, TWRR for a
+                like-for-like comparison with the index, and active return against
+                the Nifty Next 50.
+              </p>
+            </div>
+            <div class="panel grid">
+              <div class="chart-h">The fund's cash flows</div>
+              <table class="tbl compact" style="margin-top: 4px">
+                <tbody>
+                  <tr><td class="lft">Initial investment</td><td>₹1,00,00,000</td></tr>
+                  <tr><td class="lft">Additional, every quarter</td><td>~₹5,00,000</td></tr>
+                  <tr><td class="lft">Horizon</td><td>5 years</td></tr>
+                </tbody>
+              </table>
+              <div style="border-top:1px solid var(--line); margin-top:12px; padding-top:10px">
+                <span class="tag teal">Data provided</span>
+                <p class="body" style="font-size:13.5px; margin:8px 0 0">
+                  An Excel workbook in the course GitHub repository, holding daily
+                  AIF NAV, daily Nifty Next 50, and the dated cash flows.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- ══════════════════ 03 · ABSOLUTE / HPR ══════════════════ -->
+      <section class="slide" data-slug="Absolute return">
+        <div class="inner top">
+          <div class="eyebrow"><span>01 · Absolute return (HPR)</span><span class="idx">03</span></div>
+          <h2 class="head sm">Absolute return, the <em>total</em> change</h2>
+          <div class="two" style="align-items: start; margin-top: 6px">
+            <div>
+              <p class="body" style="margin-bottom: 4px">
+                The holding-period return: end value against start value, including
+                any distributions received.
+              </p>
+              <div class="fx">R = (V<sub>end</sub> − V<sub>begin</sub> + D) / V<sub>begin</sub></div>
+              <p class="bias">
+                <span class="tag rust">Bias</span>It is not normalised for time, so
+                40% earned over one year and 40% over eight years read as equal. It
+                uses only the start and end values plus distributions, ignoring the
+                path and the timing of any cash flow in between.
+              </p>
+              <span class="callout"
+                ><b>Mental model.</b> Total distance on an odometer. It records how
+                far the money travelled, not how long the trip took.</span
+              >
+            </div>
+            <div class="panel grid">
+              <div class="chart-h">Same absolute return, different clock</div>
+              <p class="chart-cap">
+                Hold ₹100 that grows to ₹160. The absolute return is fixed at 60%.
+                Change only the holding period and read the annualised equivalent.
+              </p>
+              <div class="ctrl" style="margin-top: 8px">
+                <label>Holding period <span class="v" id="hpV">5 yr</span></label>
+                <input type="range" id="hpSlider" min="1" max="10" step="1" value="5" />
+              </div>
+              <div class="mrow">
+                <div class="metric"><span class="lab">Absolute return</span>
+                  <div class="bigval pos" id="absOut">60<span style="font-size:0.5em">%</span></div></div>
+                <div class="metric"><span class="lab">Annualised equivalent</span>
+                  <div class="bigval" id="annOut">9.86<span style="font-size:0.5em">%</span></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════ 04 · CAGR ══════════════════ -->
+      <section class="slide" data-slug="CAGR">
+        <div class="inner top">
+          <div class="eyebrow"><span>02 · CAGR</span><span class="idx">04</span></div>
+          <h2 class="head sm">CAGR, one <em>smoothed</em> annual rate</h2>
+          <div class="two" style="align-items: start; margin-top: 6px">
+            <div>
+              <p class="body" style="margin-bottom: 4px">
+                The constant annual rate that carries the start value to the end
+                value over n years.
+              </p>
+              <div class="fx">CAGR = (V<sub>end</sub> / V<sub>begin</sub>)<sup>1/n</sup> − 1</div>
+              <p class="bias">
+                <span class="tag rust">Bias</span>Endpoint dependence. CAGR reads
+                only the first and last value, so two portfolios with the same
+                endpoints but very different journeys report the identical number.
+                It presents growth as smooth, hides interim volatility and
+                drawdowns, and shifts with the chosen start and end dates.
+              </p>
+              <span class="callout"
+                ><b>Mental model.</b> Average speed, total distance over total time.
+                It says nothing about the stops and the accelerations along the
+                way.</span
+              >
+            </div>
+            <div class="panel grid">
+              <div class="chart-h">Two paths, same endpoints, same CAGR</div>
+              <p class="chart-cap">
+                Both paths run ₹100 to ₹200 over 5 years. Increase the deviation and
+                the CAGR does not move, even as the path volatility rises.
+              </p>
+              <div class="chartwrap sm"><canvas id="cagrChart"></canvas></div>
+              <div class="ctrl">
+                <label>Path deviation <span class="v" id="dipV">20%</span></label>
+                <input type="range" id="dipSlider" min="0" max="45" step="1" value="20" />
+              </div>
+              <div class="mrow">
+                <div class="metric"><span class="lab">CAGR</span>
+                  <div class="bigval pos" id="cagrOut" style="font-size:clamp(22px,2.6vw,30px)">14.87%</div></div>
+                <div class="metric"><span class="lab">Path volatility</span>
+                  <div class="bigval" id="cagrVol" style="font-size:clamp(22px,2.6vw,30px)">18%</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════ 05 · XIRR ══════════════════ -->
+      <section class="slide" data-slug="XIRR">
+        <div class="inner top">
+          <div class="eyebrow"><span>03 · XIRR (money-weighted)</span><span class="idx">05</span></div>
+          <h2 class="head sm">XIRR, the rate on <em>dated</em> cash flows</h2>
+          <div class="two" style="align-items: start; margin-top: 6px">
+            <div>
+              <p class="body" style="margin-bottom: 4px">
+                The rate that discounts every dated cash flow to a net present value
+                of zero. It is the money-weighted return.
+              </p>
+              <div class="fx">Σ<sub>k</sub> CF<sub>k</sub> / (1 + r)<sup>(d<sub>k</sub> − d<sub>0</sub>)/365</sup> = 0</div>
+              <p class="bias">
+                <span class="tag rust">Bias</span>Money-weighted, so the size and
+                timing of contributions drive the result. It reports the investor's
+                own experience rather than the strategy. It assumes interim flows
+                are reinvested at r, can have multiple or no real roots when flow
+                signs alternate, and needs a numerical solver.
+              </p>
+              <span class="callout"
+                ><b>Mental model.</b> The interest rate a bank account would have to
+                pay to reproduce your exact dated deposits and withdrawals.</span
+              >
+            </div>
+            <div class="panel grid">
+              <div class="chart-h">A 12-month SIP of ₹10,000</div>
+              <p class="chart-cap">
+                ₹10,000 invested on the first of each month, ₹1,20,000 in total.
+                Set the year-end value and read the money-weighted XIRR against the
+                plain absolute return.
+              </p>
+              <div class="ctrl" style="margin-top: 8px">
+                <label>Year-end value <span class="v" id="sipV">₹1,28,900</span></label>
+                <input type="range" id="sipSlider" min="105000" max="155000" step="1000" value="128900" />
+              </div>
+              <div class="mrow">
+                <div class="metric"><span class="lab">XIRR (annualised)</span>
+                  <div class="bigval pos" id="xirrOut">13.97%</div></div>
+                <div class="metric"><span class="lab">Absolute return</span>
+                  <div class="bigval" id="xabsOut">7.4%</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════ 06 · TWRR ══════════════════ -->
+      <section class="slide" data-slug="TWRR">
+        <div class="inner top">
+          <div class="eyebrow"><span>04 · TWRR (time-weighted)</span><span class="idx">06</span></div>
+          <h2 class="head sm">TWRR, cash-flow timing <em>removed</em></h2>
+          <div class="two" style="align-items: start; margin-top: 6px">
+            <div>
+              <p class="body" style="margin-bottom: 4px">
+                Chain the return of each sub-period between external cash flows. The
+                deposits and withdrawals cancel out.
+              </p>
+              <div class="fx">1 + TWRR = ∏<sub>i</sub> (1 + r<sub>i</sub>)</div>
+              <p class="bias">
+                <span class="tag rust">Bias</span>It requires valuing the portfolio
+                at every cash-flow date, which is data-intensive. By design it
+                removes the effect of the investor's timing, so it does not equal
+                the rupee return the investor actually earned and can diverge from
+                XIRR. Each sub-period is weighted equally regardless of the capital
+                deployed in it.
+              </p>
+              <span class="callout"
+                ><b>Mental model.</b> How one rupee left fully invested from the
+                start would have grown. It measures the strategy, not the investor,
+                and is the fund-comparison standard (GIPS, SEBI).</span
+              >
+            </div>
+            <div class="panel grid">
+              <div class="chart-h">Same fund path, TWRR against XIRR</div>
+              <p class="chart-cap">
+                Fund falls 10% in the first half, rises 25% in the second, so TWRR
+                is fixed. Move ₹1,20,000 between an early and a mid-year entry and
+                watch only the money-weighted number react.
+              </p>
+              <div class="ctrl" style="margin-top: 8px">
+                <label>Share invested at start <span class="v" id="twV">50%</span></label>
+                <input type="range" id="twSlider" min="0" max="100" step="5" value="50" />
+              </div>
+              <div class="mrow">
+                <div class="metric"><span class="lab">TWRR (strategy)</span>
+                  <div class="bigval" id="twrrOut" style="color:var(--slate)">12.50%</div></div>
+                <div class="metric"><span class="lab">XIRR (investor)</span>
+                  <div class="bigval pos" id="twxirrOut">25.48%</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════ 07 · ROLLING RETURNS ══════════════════ -->
+      <section class="slide" data-slug="Rolling returns">
+        <div class="inner top">
+          <div class="eyebrow"><span>05 · Rolling returns</span><span class="idx">07</span></div>
+          <h2 class="head sm">Rolling returns, <em>every</em> start date</h2>
+          <div class="two" style="align-items: start; margin-top: 6px">
+            <div>
+              <p class="body" style="margin-bottom: 4px">
+                The annualised return over every window of length k that slides
+                through the history, reported as a distribution.
+              </p>
+              <div class="fx">R<sub>t</sub> = (V<sub>t+k</sub> / V<sub>t</sub>)<sup>1/k</sup> − 1&nbsp;&nbsp;<small>for all t</small></div>
+              <p class="bias">
+                <span class="tag rust">Bias</span>Overlapping windows share data, so
+                the observations are autocorrelated rather than independent, and
+                their standard errors are understated. Results depend on the length
+                of available history and on the chosen window and step. Each window
+                is itself a CAGR, so it inherits within-window smoothing.
+              </p>
+              <span class="callout"
+                ><b>Mental model.</b> Not one lucky start date, but the full set of
+                outcomes an investor entering on every date would have seen.</span
+              >
+            </div>
+            <div class="panel grid">
+              <div class="chart-h">NIFTY 50 rolling return by start year</div>
+              <p class="chart-cap">
+                Annual NIFTY 50 returns, 2007 to 2024. As the window lengthens the
+                bars converge toward the long-run rate.
+              </p>
+              <div class="chartwrap sm"><canvas id="rollChart"></canvas></div>
+              <div class="ctrl">
+                <label>Window length <span class="v" id="kV">3 yr</span></label>
+                <input type="range" id="kSlider" min="1" max="10" step="1" value="3" />
+              </div>
+              <div class="mrow">
+                <div class="metric"><span class="lab">Min</span><div class="bigval neg" id="rMin" style="font-size:clamp(18px,2.2vw,26px)">0%</div></div>
+                <div class="metric"><span class="lab">Average</span><div class="bigval" id="rAvg" style="font-size:clamp(18px,2.2vw,26px)">12%</div></div>
+                <div class="metric"><span class="lab">Max</span><div class="bigval pos" id="rMax" style="font-size:clamp(18px,2.2vw,26px)">22%</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════ 08 · ACTIVE RETURN ══════════════════ -->
+      <section class="slide" data-slug="Active return">
+        <div class="inner top">
+          <div class="eyebrow"><span>06 · Active return</span><span class="idx">08</span></div>
+          <h2 class="head sm">Active return, the margin over the <em>benchmark</em></h2>
+          <div class="two rail" style="align-items: start; margin-top: 6px">
+            <div>
+              <p class="body" style="margin-bottom: 4px">
+                The portfolio return against the return of its benchmark over the
+                same period.
+              </p>
+              <div class="fx">R<sub>active</sub> = R<sub>p</sub> − R<sub>b</sub>&nbsp;&nbsp;<small>(geometric: (1+R<sub>p</sub>)/(1+R<sub>b</sub>) − 1)</small></div>
+              <p class="bias">
+                <span class="tag rust">Bias</span>It depends entirely on the choice
+                of benchmark, and a mismatched benchmark makes the number
+                meaningless. It carries no adjustment for the risk taken to earn it,
+                so a positive figure can come from higher beta or leverage rather
+                than selection. Simple subtraction is only approximate once returns
+                compound over several periods.
+              </p>
+              <span class="callout"
+                ><b>Mental model.</b> The scoreboard margin against the index, read
+                before any risk adjustment.</span
+              >
+            </div>
+            <div class="panel grid">
+              <div class="chart-h">Worked figures</div>
+              <table class="tbl compact" style="margin-top: 4px">
+                <tbody>
+                  <tr><td class="lft">Portfolio return R<sub>p</sub></td><td>14.00%</td></tr>
+                  <tr><td class="lft">Benchmark R<sub>b</sub> (NIFTY 50 TRI)</td><td>12.86%</td></tr>
+                  <tr style="background: rgba(14,124,102,0.06)"><td class="lft"><b>Active return (arithmetic)</b></td><td style="color:var(--teal-deep)"><b>+1.14%</b></td></tr>
+                  <tr><td class="lft">Active return (geometric)</td><td>+1.01%</td></tr>
+                </tbody>
+              </table>
+              <p class="chart-cap" style="margin-top: 10px">
+                The arithmetic and geometric figures separate as the horizon
+                lengthens, since the geometric form compounds the ratio of the two
+                return streams.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ══════════════════ 09 · EXCESS RETURN ══════════════════ -->
+      <section class="slide" data-slug="Excess return">
+        <div class="inner top">
+          <div class="eyebrow"><span>07 · Excess return</span><span class="idx">09</span></div>
+          <h2 class="head sm">Excess return, the reward over <em>cash</em></h2>
+          <div class="two rail" style="align-items: start; margin-top: 6px">
+            <div>
+              <p class="body" style="margin-bottom: 4px">
+                The portfolio return above the risk-free rate. This is the quantity
+                that feeds the Sharpe ratio and the CAPM regression.
+              </p>
+              <div class="fx">R<sub>excess</sub> = R<sub>p</sub> − R<sub>f</sub></div>
+              <p class="bias">
+                <span class="tag rust">Bias</span>The term is ambiguous, since excess
+                can also mean over a benchmark, so the reference has to be stated.
+                The value depends on the risk-free proxy chosen, such as the bill
+                tenor and the currency. It is a raw difference and carries no
+                adjustment for the risk taken.
+              </p>
+              <span class="callout"
+                ><b>Mental model.</b> The reward for taking any risk at all, above
+                parking the money in the safest asset.</span
+              >
+            </div>
+            <div class="panel grid">
+              <div class="chart-h">The two differences, side by side</div>
+              <table class="tbl compact" style="margin-top: 4px">
+                <tbody>
+                  <tr><td class="lft">Portfolio return R<sub>p</sub></td><td>14.00%</td></tr>
+                  <tr><td class="lft">Risk-free R<sub>f</sub> (T-bill)</td><td>6.50%</td></tr>
+                  <tr style="background: rgba(14,124,102,0.06)"><td class="lft"><b>Excess over risk-free</b></td><td style="color:var(--teal-deep)"><b>+7.50%</b></td></tr>
+                  <tr style="color:var(--ink-faint)"><td class="lft">Excess over benchmark (item 6)</td><td>+1.14%</td></tr>
+                </tbody>
+              </table>
+              <p class="chart-cap" style="margin-top: 10px">
+                Excess over risk-free isolates the reward for bearing risk. Excess
+                over a benchmark isolates the margin against a peer index. Both are
+                called excess return in practice.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════ 10 · SHARPE ══════════════════ -->
+      <section class="slide" data-slug="Sharpe ratio">
+        <div class="inner top">
+          <div class="eyebrow"><span>08 · Risk-adjusted return (Sharpe)</span><span class="idx">10</span></div>
+          <h2 class="head sm">Sharpe, excess return per unit of <em>total risk</em></h2>
+          <div class="two" style="align-items: start; margin-top: 6px">
+            <div>
+              <p class="body" style="margin-bottom: 4px">
+                The excess return over the risk-free rate, divided by the standard
+                deviation of returns.
+              </p>
+              <div class="fx">S = (R<sub>p</sub> − R<sub>f</sub>) / σ<sub>p</sub></div>
+              <p class="bias">
+                <span class="tag rust">Bias</span>It uses total volatility, which
+                penalises upside and downside symmetrically, so it fits skewed or
+                option-like returns poorly. It relies on mean and variance
+                describing the distribution, ignoring skewness and fat tails.
+                Annualising by the square root of the number of periods assumes
+                returns are independent over time. Stale pricing in illiquid assets
+                lowers measured σ and raises the ratio.
+              </p>
+              <span class="callout"
+                ><b>Mental model.</b> Return earned per unit of total volatility,
+                measured against cash. Its original name was the reward-to-variability
+                ratio.</span
+              >
+            </div>
+            <div class="panel grid">
+              <div class="chart-h">Sharpe of a 14% return, σ of 15%</div>
+              <p class="chart-cap">
+                The numerator is the excess return from item 7. Move the risk-free
+                rate and read how the ratio responds.
+              </p>
+              <div class="ctrl" style="margin-top: 8px">
+                <label>Risk-free rate R<sub>f</sub> <span class="v" id="srfV">6.5%</span></label>
+                <input type="range" id="srfSlider" min="0" max="12" step="0.5" value="6.5" />
+              </div>
+              <div class="mrow">
+                <div class="metric"><span class="lab">Excess return</span>
+                  <div class="bigval" id="sexOut">7.50%</div></div>
+                <div class="metric"><span class="lab">Sharpe ratio</span>
+                  <div class="bigval pos" id="sharpeOut">0.50</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════ 11 · CAPM REQUIRED RETURN ══════════════════ -->
+      <section class="slide" data-slug="CAPM required">
+        <div class="inner top">
+          <div class="eyebrow"><span>09 · Required return (CAPM)</span><span class="idx">11</span></div>
+          <h2 class="head sm">CAPM, the <em>required</em> return, a hurdle</h2>
+          <div class="two" style="align-items: start; margin-top: 6px">
+            <div>
+              <p class="body" style="margin-bottom: 4px">
+                The return an asset should offer for its systematic risk. This is an
+                expected return set before investing, not a realised one.
+              </p>
+              <div class="fx">E(R<sub>i</sub>) = R<sub>f</sub> + β<sub>i</sub>(E(R<sub>m</sub>) − R<sub>f</sub>)</div>
+              <p class="bias">
+                <span class="tag rust">Bias</span>It is single-factor, pricing only
+                market risk, while size, value, and momentum factors explain part of
+                returns it misses (Fama and French). It rests on assumptions such as
+                homogeneous expectations, frictionless markets, and one period. Beta
+                is estimated with error and drifts, and the true market portfolio is
+                unobservable (Roll's critique).
+              </p>
+              <span class="callout"
+                ><b>Mental model.</b> The minimum return the asset must offer to
+                justify its market risk, a rent for bearing systematic risk.</span
+              >
+            </div>
+            <div class="panel grid">
+              <div class="chart-h">Security Market Line</div>
+              <p class="chart-cap">R<sub>f</sub> 6.5%, market premium 6.0%. Move beta to read the required return.</p>
+              <div class="chartwrap sm"><canvas id="smlChart"></canvas></div>
+              <div class="ctrl">
+                <label>Beta β <span class="v" id="capmBetaV">0.90</span></label>
+                <input type="range" id="capmBeta" min="0" max="2" step="0.05" value="0.9" />
+              </div>
+              <div class="metric"><span class="lab">Required return</span>
+                <div class="bigval pos" id="capmOut">11.9<span style="font-size:0.5em">%</span></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════ 12 · ALPHA ══════════════════ -->
+      <section class="slide" data-slug="Alpha return">
+        <div class="inner top">
+          <div class="eyebrow"><span>10 · Alpha return</span><span class="idx">12</span></div>
+          <h2 class="head sm">Alpha, active return <em>after</em> market risk</h2>
+          <div class="two rail" style="align-items: start; margin-top: 6px">
+            <div>
+              <p class="body" style="margin-bottom: 4px">
+                The return above what CAPM predicts for the portfolio's beta.
+              </p>
+              <div class="fx">α = R<sub>p</sub> − [ R<sub>f</sub> + β<sub>p</sub>(R<sub>m</sub> − R<sub>f</sub>) ]</div>
+              <p class="bias">
+                <span class="tag rust">Bias</span>It is model-dependent. It assumes
+                CAPM is the correct return model, so exposure to factors outside the
+                model, such as size, value, or momentum, is recorded as alpha. It
+                inherits the beta estimate's sensitivity to the window, the
+                frequency, and the benchmark, and it assumes beta is stable.
+              </p>
+              <span class="callout"
+                ><b>Mental model.</b> The part of the return market exposure cannot
+                account for. Active return (item 6) measures the margin;
+                alpha measures the margin after paying for market risk.</span
+              >
+            </div>
+            <div class="panel grid">
+              <div class="chart-h">Alpha from the same portfolio</div>
+              <table class="tbl compact" style="margin-top: 4px">
+                <tbody>
+                  <tr><td class="lft">Portfolio return R<sub>p</sub></td><td>14.00%</td></tr>
+                  <tr><td class="lft">Risk-free R<sub>f</sub></td><td>6.50%</td></tr>
+                  <tr><td class="lft">Market R<sub>m</sub> (NIFTY 50 TRI)</td><td>12.86%</td></tr>
+                  <tr><td class="lft">Beta β</td><td>0.90</td></tr>
+                  <tr><td class="lft">CAPM-predicted return</td><td>12.22%</td></tr>
+                  <tr style="background: rgba(14,124,102,0.06)"><td class="lft"><b>Alpha</b></td><td style="color:var(--teal-deep)"><b>+1.78%</b></td></tr>
+                </tbody>
+              </table>
+              <p class="chart-cap" style="margin-top: 10px">
+                Active return here is +1.14%, alpha is +1.78%. They differ because
+                beta of 0.90 lowers the risk-based hurdle below the benchmark.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- ══════════════════ 13 · WHICH RETURN, WHICH SITUATION ══════════════════ -->
+      <section class="slide" data-slug="Which return where">
+        <div class="inner top">
+          <div class="eyebrow"><span>Reference · matching the measure to the case</span><span class="idx">13</span></div>
+          <h2 class="head sm">Which return, <em>which situation</em></h2>
+          <div class="panel grid" style="margin-top: 8px">
+            <table class="tbl compact">
+              <thead>
+                <tr><th class="lft">Situation</th><th class="lft">Return measure</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="lft">Lumpsum, buy and hold, total growth</td><td class="lft"><b>Absolute return</b></td></tr>
+                <tr><td class="lft">Lumpsum, buy and hold, annualised</td><td class="lft"><b>CAGR</b></td></tr>
+                <tr><td class="lft">SIP or irregular contributions, the investor's own return</td><td class="lft"><b>XIRR</b> (money-weighted)</td></tr>
+                <tr><td class="lft">Comparing funds or managers, independent of investor flows</td><td class="lft"><b>TWRR</b> (time-weighted)</td></tr>
+                <tr><td class="lft">Consistency across entry dates and horizon dependence</td><td class="lft"><b>Rolling returns</b></td></tr>
+                <tr><td class="lft">Performance against a benchmark index</td><td class="lft"><b>Active return</b></td></tr>
+                <tr><td class="lft">Reward above the risk-free rate (input to Sharpe, CAPM)</td><td class="lft"><b>Excess return</b></td></tr>
+                <tr><td class="lft">Return per unit of total risk</td><td class="lft"><b>Sharpe ratio</b></td></tr>
+                <tr><td class="lft">Setting a hurdle or expected return before investing</td><td class="lft"><b>CAPM required return</b></td></tr>
+                <tr><td class="lft">Performance against the benchmark after market risk</td><td class="lft"><b>Alpha</b></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="body" style="max-width: 84ch; margin-top: 12px; font-size: clamp(13px,1.35vw,15.5px)">
+            The SIP against lumpsum split is the common one. A mutual fund SIP is
+            read with XIRR because the contributions are dated and unequal. The
+            scheme itself is compared using TWRR, which strips those contributions
+            out. A single lumpsum held to a date is read with CAGR, since there is
+            only one inflow and one endpoint.
+          </p>
+        </div>
+      </section>
+
+      <!-- ══════════════════ LAST · THANK YOU (keep this slide last) ══════════════════ -->
+      <section class="slide" data-slug="Thank you">
+        <div class="inner">
+          <div class="eyebrow">
+            <span>End of tutorial</span><span class="idx">14</span>
+          </div>
+          <h1 class="title" style="font-size: clamp(40px, 7vw, 88px)">
+            Thank you.<br /><em>Questions?</em>
+          </h1>
+          <div class="title-meta">
+            <span class="who">Abhishek Kashyap</span>
+            <span class="mail">abhishek_k@hs.iitr.ac.in</span>
+          </div>
+          <div class="refs">
+            <b>References &amp; reading</b>
+            <div>
+              Sharpe, W. F. (1966). Mutual fund performance.
+              <i>Journal of Business</i>, 39(1), 119-138.
+            </div>
+            <div>
+              Sharpe, W. F. (1964). Capital asset prices. <i>Journal of Finance</i>,
+              19(3), 425-442. With Lintner (1965) and Mossin (1966).
+            </div>
+            <div>
+              Jensen, M. C. (1968). The performance of mutual funds, 1945-1964.
+              <i>Journal of Finance</i>, 23(2), 389-416.
+            </div>
+            <div>
+              Fama, E. F., &amp; French, K. R. (1992). The cross-section of expected
+              stock returns. <i>Journal of Finance</i>, 47(2), 427-465.
+            </div>
+            <div>
+              Roll, R. (1977). A critique of the asset pricing theory's tests.
+              <i>Journal of Financial Economics</i>, 4(2), 129-176.
+            </div>
+            <div>
+              CFA Institute. Global Investment Performance Standards (GIPS), on
+              time-weighted and money-weighted return.
+            </div>
+            <div>
+              Bodie, Z., Kane, A., &amp; Marcus, A. J. <i>Investments</i>.
+              McGraw-Hill.
+            </div>
+            <div>
+              Data: NSE Indices Ltd., NIFTY 50 TRI historical returns. SIP and path
+              figures are worked examples, calibrated to the values shown on each
+              slide.
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- overview (populated by the engine) -->
+    <div id="overview">
+      <h3>Overview: jump to a slide</h3>
+      <div class="ovgrid" id="ovgrid"></div>
+    </div>
+
+    <!-- nav (canonical: slug · prev · counter · next · overview · fullscreen) -->
+    <div id="nav">
+      <span class="slug" id="slug">Title</span>
+      <div class="ctrls">
+        <button id="prev" title="Previous (←)" aria-label="Previous">‹</button>
+        <span class="count" id="count">01 / 04</span>
+        <button id="next" title="Next (→)" aria-label="Next">›</button>
+        <button id="ovBtn" title="Overview (O)" aria-label="Overview">▦</button>
+        <button id="fsBtn" title="Fullscreen (F)" aria-label="Fullscreen">
+          ⤢
+        </button>
+      </div>
+    </div>
+
+    <script>
+      "use strict";
+      /* ══════════════════════════════════════════════════════════════════
+         ENGINE - navigation, overview, keyboard, swipe, fullscreen (do not edit)
+         ══════════════════════════════════════════════════════════════════ */
+      const COL = {
+        paper: "#f1f3ef",
+        panel: "#fbfcfa",
+        ink: "#182129",
+        inkSoft: "#4a5760",
+        inkFaint: "#8b979e",
+        line: "#d7dcd4",
+        lineStrong: "#c3cabf",
+        teal: "#0e7c66",
+        tealDeep: "#0a5a4a",
+        amber: "#b9822b",
+        rust: "#b0472b",
+        blue: "#3b6c8c",
+        slate: "#6b7a82",
+      };
+      const $ = (id) => document.getElementById(id);
+      const pad = (n) => String(n).padStart(2, "0");
+
+      if (window.Chart) {
+        Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
+        Chart.defaults.font.size = 13;
+        Chart.defaults.color = COL.slate;
+        Chart.defaults.plugins.legend.labels.boxWidth = 12;
+        Chart.defaults.plugins.legend.labels.font = {
+          family: "'IBM Plex Mono'",
+          size: 12,
+        };
+      }
+
+      const slides = Array.from(document.querySelectorAll(".slide"));
+      const TOTAL = slides.length;
+      let cur = 0;
+      const initialized = {};
+
+      function show(i) {
+        i = Math.max(0, Math.min(TOTAL - 1, i));
+        slides[cur].classList.remove("active");
+        cur = i;
+        slides[cur].classList.add("active");
+        $("progress").style.width = ((cur + 1) / TOTAL) * 100 + "%";
+        $("count").textContent = pad(cur + 1) + " / " + pad(TOTAL);
+        $("slug").textContent = slides[cur].dataset.slug || "";
+        document
+          .querySelectorAll(".ovcell")
+          .forEach((c, idx) => c.classList.toggle("here", idx === cur));
+        if (!initialized[cur]) {
+          initialized[cur] = true;
+          if (initFns[cur]) requestAnimationFrame(() => initFns[cur]());
+        }
+        try {
+          history.replaceState(null, "", "#" + (cur + 1));
+        } catch (e) {}
+      }
+      const next = () => show(cur + 1);
+      const prev = () => show(cur - 1);
+      $("next").onclick = next;
+      $("prev").onclick = prev;
+
+      /* overview grid */
+      const ovgrid = $("ovgrid");
+      slides.forEach((s, idx) => {
+        const b = document.createElement("button");
+        b.className = "ovcell";
+        b.innerHTML =
+          '<div class="on">' +
+          pad(idx + 1) +
+          '</div><div class="ot">' +
+          (s.dataset.slug || "") +
+          "</div>";
+        b.onclick = () => {
+          show(idx);
+          $("overview").classList.remove("on");
+        };
+        ovgrid.appendChild(b);
+      });
+      function toggleOverview() {
+        $("overview").classList.toggle("on");
+      }
+      function toggleFs() {
+        if (!document.fullscreenElement)
+          document.documentElement.requestFullscreen?.();
+        else document.exitFullscreen?.();
+      }
+      $("ovBtn").onclick = toggleOverview;
+      $("fsBtn").onclick = toggleFs;
+
+      /* keyboard */
+      document.addEventListener("keydown", (e) => {
+        const tag = document.activeElement
+          ? document.activeElement.tagName
+          : "";
+        if (
+          ["INPUT", "TEXTAREA"].includes(tag) &&
+          ["ArrowLeft", "ArrowRight"].includes(e.key)
+        )
+          return;
+        if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") {
+          e.preventDefault();
+          next();
+        } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+          e.preventDefault();
+          prev();
+        } else if (e.key === "Home") {
+          show(0);
+        } else if (e.key === "End") {
+          show(TOTAL - 1);
+        } else if (e.key.toLowerCase() === "o") {
+          toggleOverview();
+        } else if (e.key.toLowerCase() === "f") {
+          toggleFs();
+        } else if (e.key === "Escape") {
+          $("overview").classList.remove("on");
+        }
+      });
+
+      /* touch swipe (ignores swipes that start on a control) */
+      let tx = 0;
+      document.addEventListener(
+        "touchstart",
+        (e) => (tx = e.changedTouches[0].clientX),
+        { passive: true },
+      );
+      document.addEventListener(
+        "touchend",
+        (e) => {
+          const t = e.target;
+          if (
+            t.closest &&
+            (t.closest("input") ||
+              t.closest("button") ||
+              t.closest("a") ||
+              t.closest("table"))
+          )
+            return;
+          const dx = e.changedTouches[0].clientX - tx;
+          if (Math.abs(dx) > 65) {
+            dx < 0 ? next() : prev();
+          }
+        },
+        { passive: true },
+      );
+
+      /* ══════════════════════════════════════════════════════════════════
+         PER-SLIDE INITIALIZERS - add one entry per interactive slide.
+         Key = slide index (0-based). Runs once, the first time that slide
+         is shown. Static slides need no entry. Example below is for slide
+         index 2 (the "Interactive pattern" slide).
+         ══════════════════════════════════════════════════════════════════ */
+      const initFns = {};
+
+      /* ---- shared helpers & data ---- */
+      const GRID = { color: COL.line };
+      const pct = (v) => v + "%";
+      const inr = (v) => "₹" + Math.round(v).toLocaleString("en-IN");
+      // annual NIFTY 50 returns (approx, NSE), 2007-2024, for rolling windows
+      const NIFTY07 = [54.8, -51.8, 75.8, 17.9, -24.6, 27.7, 6.8, 31.4, -3.0, 4.4, 30.3, 4.6, 13.5, 16.1, 25.6, 5.7, 21.3, 10.1];
+      const NIFTY07_YRS = Array.from({ length: NIFTY07.length }, (_, i) => 2007 + i);
+
+      // bisection IRR solver on dated cash flows (times in years)
+      function solveIRR(cfs, ts) {
+        const npv = (r) => cfs.reduce((s, cf, i) => s + cf / Math.pow(1 + r, ts[i]), 0);
+        let lo = -0.99, hi = 10, flo = npv(lo), fhi = npv(hi);
+        if (flo * fhi > 0) return NaN;
+        for (let i = 0; i < 200; i++) {
+          const mid = (lo + hi) / 2, fm = npv(mid);
+          if (Math.abs(fm) < 1e-6) return mid;
+          if (flo * fm < 0) { hi = mid; fhi = fm; } else { lo = mid; flo = fm; }
+        }
+        return (lo + hi) / 2;
+      }
+
+      /* ══ 1 · Absolute return: holding-period slider ══ */
+      initFns[2] = function () {
+        const s = $("hpSlider");
+        function upd() {
+          const n = +s.value;
+          $("hpV").textContent = n + (n === 1 ? " yr" : " yr");
+          const ann = (Math.pow(1.6, 1 / n) - 1) * 100;
+          $("annOut").innerHTML = ann.toFixed(2) + '<span style="font-size:0.5em">%</span>';
+        }
+        s.addEventListener("input", upd);
+        upd();
+      };
+
+      /* ══ 2 · CAGR: same endpoints, adjustable path ══ */
+      initFns[3] = function () {
+        const n = 5, v0 = 100, vT = 200;
+        const cagr = Math.pow(vT / v0, 1 / n) - 1;
+        const smooth = Array.from({ length: n + 1 }, (_, t) => v0 * Math.pow(1 + cagr, t));
+        const s = $("dipSlider");
+        const chart = new Chart($("cagrChart"), {
+          type: "line",
+          data: {
+            labels: ["Y0", "Y1", "Y2", "Y3", "Y4", "Y5"],
+            datasets: [
+              { label: "Smooth (CAGR)", data: smooth.slice(), borderColor: COL.slate,
+                borderDash: [5, 4], borderWidth: 2, pointRadius: 0, tension: 0 },
+              { label: "Actual path", data: smooth.slice(), borderColor: COL.teal,
+                backgroundColor: "rgba(14,124,102,0.08)", fill: true, borderWidth: 2.5,
+                pointRadius: 3, tension: 0.25 },
+            ],
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: true },
+              tooltip: { callbacks: { label: (c) => c.dataset.label + ": " + inr(c.parsed.y) } } },
+            scales: { x: { grid: GRID }, y: { grid: GRID, ticks: { callback: inr } } },
+          },
+        });
+        function upd() {
+          const A = +s.value; // deviation amplitude, %
+          $("dipV").textContent = A + "%";
+          const path = smooth.map((v, t) => v * (1 + (A / 100) * Math.sin((2 * Math.PI * t) / n)));
+          path[0] = v0; path[n] = vT; // pin endpoints exactly
+          chart.data.datasets[1].data = path;
+          chart.update("none");
+          // realised year-on-year volatility of the actual path
+          const rets = [];
+          for (let t = 1; t <= n; t++) rets.push(path[t] / path[t - 1] - 1);
+          const mu = rets.reduce((a, b) => a + b, 0) / rets.length;
+          const sd = Math.sqrt(rets.reduce((a, b) => a + (b - mu) ** 2, 0) / rets.length) * 100;
+          $("cagrOut").textContent = (cagr * 100).toFixed(2) + "%";
+          $("cagrVol").textContent = sd.toFixed(1) + "%";
+        }
+        s.addEventListener("input", upd);
+        upd();
+      };
+
+      /* ══ 3 · XIRR: 12-month SIP, ending-value slider ══ */
+      initFns[4] = function () {
+        const s = $("sipSlider");
+        const cfs = [], ts = [];
+        for (let k = 0; k < 12; k++) { cfs.push(-10000); ts.push(k / 12); }
+        function upd() {
+          const V = +s.value;
+          $("sipV").textContent = inr(V);
+          const c = cfs.concat(V), t = ts.concat(1);
+          const r = solveIRR(c, t) * 100;
+          $("xirrOut").textContent = (isNaN(r) ? "n/a" : r.toFixed(2) + "%");
+          const abs = ((V - 120000) / 120000) * 100;
+          $("xabsOut").textContent = abs.toFixed(1) + "%";
+          $("xirrOut").className = "bigval " + (r >= 0 ? "pos" : "neg");
+        }
+        s.addEventListener("input", upd);
+        upd();
+      };
+
+      /* ══ 4 · TWRR vs XIRR: contribution-timing slider ══ */
+      initFns[5] = function () {
+        const s = $("twSlider");
+        const r1 = -0.10, r2 = 0.25, twrr = (1 + r1) * (1 + r2) - 1; // 12.5%
+        const TOTAL = 120000;
+        function upd() {
+          const w = +s.value / 100;
+          $("twV").textContent = +s.value + "%";
+          const A0 = TOTAL * w, A1 = TOTAL * (1 - w);
+          const V = A0 * (1 + r1) * (1 + r2) + A1 * (1 + r2);
+          const x = solveIRR([-A0, -A1, V], [0, 0.5, 1]) * 100;
+          $("twrrOut").textContent = (twrr * 100).toFixed(2) + "%";
+          $("twxirrOut").textContent = (isNaN(x) ? "n/a" : x.toFixed(2) + "%");
+        }
+        s.addEventListener("input", upd);
+        upd();
+      };
+
+      /* ══ 5 · Rolling returns: window-length slider ══ */
+      initFns[6] = function () {
+        const s = $("kSlider");
+        const chart = new Chart($("rollChart"), {
+          type: "bar",
+          data: { labels: [], datasets: [{ label: "Annualised return", data: [],
+            backgroundColor: "rgba(14,124,102,0.7)", borderWidth: 0 }] },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false },
+              tooltip: { callbacks: { label: (c) => c.parsed.y.toFixed(1) + "%" } } },
+            scales: { x: { grid: GRID }, y: { grid: GRID, ticks: { callback: pct } } },
+          },
+        });
+        function rolling(k) {
+          const out = [], labels = [];
+          for (let i = 0; i + k <= NIFTY07.length; i++) {
+            let p = 1;
+            for (let j = i; j < i + k; j++) p *= 1 + NIFTY07[j] / 100;
+            out.push((Math.pow(p, 1 / k) - 1) * 100);
+            labels.push(NIFTY07_YRS[i]);
+          }
+          return { out, labels };
+        }
+        function upd() {
+          const k = +s.value;
+          $("kV").textContent = k + " yr";
+          const { out, labels } = rolling(k);
+          chart.data.labels = labels.map(String);
+          chart.data.datasets[0].data = out;
+          chart.data.datasets[0].backgroundColor = out.map((v) =>
+            v >= 0 ? "rgba(14,124,102,0.7)" : "rgba(176,71,43,0.75)");
+          chart.update("none");
+          const mn = Math.min(...out), mx = Math.max(...out),
+            av = out.reduce((a, b) => a + b, 0) / out.length;
+          $("rMin").textContent = mn.toFixed(1) + "%";
+          $("rAvg").textContent = av.toFixed(1) + "%";
+          $("rMax").textContent = mx.toFixed(1) + "%";
+        }
+        s.addEventListener("input", upd);
+        upd();
+      };
+
+      /* ══ 8 · Sharpe: risk-free slider ══ */
+      initFns[9] = function () {
+        const s = $("srfSlider");
+        const Rp = 14, sd = 15;
+        function upd() {
+          const rf = +s.value;
+          $("srfV").textContent = rf + "%";
+          const ex = Rp - rf, sh = ex / sd;
+          $("sexOut").textContent = ex.toFixed(2) + "%";
+          $("sharpeOut").textContent = sh.toFixed(2);
+          $("sexOut").className = "bigval " + (ex >= 0 ? "" : "neg");
+          $("sharpeOut").className = "bigval " + (sh >= 0 ? "pos" : "neg");
+        }
+        s.addEventListener("input", upd);
+        upd();
+      };
+
+      /* ══ 9 · CAPM required return: SML with beta slider ══ */
+      initFns[10] = function () {
+        const rf = 6.5, prem = 6.0, s = $("capmBeta");
+        const line = [{ x: 0, y: rf }, { x: 2, y: rf + 2 * prem }];
+        const chart = new Chart($("smlChart"), {
+          data: {
+            datasets: [
+              { type: "line", label: "SML", data: line, borderColor: COL.teal,
+                borderWidth: 2.5, pointRadius: 0 },
+              { type: "scatter", label: "Asset", data: [{ x: 0.9, y: rf + 0.9 * prem }],
+                pointBackgroundColor: COL.rust, pointBorderColor: COL.rust, pointRadius: 7 },
+            ],
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { type: "linear", grid: GRID, min: 0, max: 2, title: { display: true, text: "Beta (β)" } },
+              y: { grid: GRID, title: { display: true, text: "Required return %" }, ticks: { callback: pct } },
+            },
+          },
+        });
+        function upd() {
+          const b = +s.value, er = rf + b * prem;
+          $("capmBetaV").textContent = b.toFixed(2);
+          $("capmOut").innerHTML = er.toFixed(1) + '<span style="font-size:0.5em">%</span>';
+          chart.data.datasets[1].data = [{ x: b, y: er }];
+          chart.update("none");
+        }
+        s.addEventListener("input", upd);
+        upd();
+      };
+
+      /* boot - honour a #n hash for deep-linking (e.g. …/deck.html#3) */
+      const start = Math.max(
+        0,
+        (parseInt((location.hash || "").slice(1), 10) || 1) - 1,
+      );
+      show(Math.min(start, TOTAL - 1));
+    </script>
+  </body>
+</html>
