@@ -4,6 +4,13 @@
 
 With Weeks 3–4 you **built** a portfolio. Week 5 asks the harder question that comes next: once it is running, *how do you judge it?* A single "14% return" headline hides almost everything that matters — whether it beat cash, beat the index, rewarded the risk taken, or simply rode a rising market. This module builds the vocabulary of performance measurement top-down, from the plainest growth number to the risk- and model-adjusted figures a committee actually defends, and it makes the point that no single number is "the return" — the right measure is chosen from the *situation*. Unlike a play-then-lecture week, the deck here is itself the interactive tool: every measure ships with a live control, so the intuition is built *inside* the slides rather than in a separate game.
 
+```javascript
+function greetMe(name) {
+    console.log("Hello, " + name + "!");
+}
+greetMe("World");
+```
+
 ---
 
 ## Contents
