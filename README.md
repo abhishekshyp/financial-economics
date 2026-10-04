@@ -16,9 +16,8 @@ Ready, set, go! https://abhishekshyp.github.io/financial-economics
 | **5** | **Measuring Portfolio Performance** — *returns are easy; risk-adjusted returns tell the real story* |
 | **6** | **Asset Accumulation & the Rebalancing Problem** — *your winners grow and your mix drifts — when do you correct course?* |
 | **7** | **Can You Beat the Market?** — *skill or luck? put the efficient-market hypothesis to the test* |
-| **8** | **Other Ways to Hedge Risk** — *diversification, options, insurance — tools beyond just holding cash* |
-| **9** | **Active Investing: Direct Equity, DIY** — *think you can pick stocks? let's check your smartness* |
-| **10** | **Lazy Investing** — *do less, win more? the case for going passive* |
+| **8** | **Active Investing: Direct Equity, DIY** — *think you can pick stocks? let's check your smartness* |
+| **9** | **Lazy Investing** — *do less, win more? the case for going passive* |
 
 ---
 
@@ -42,10 +41,7 @@ There are **10 tutorials**, and **each one carries a graded assignment**.
 | Submitting an assignment | **2** per tutorial |
 | Placing in the **top 3** submissions | **+2** per tutorial (bonus) |
 
-- Submit all ten assignments → **2 × 10 = 20 marks**.
-- Submit all ten *and* finish in the top 3 every time → **(2 + 2) × 10 = 40 marks**.
-
-In short: **20 marks** are within reach through consistent submission, and the remaining **20** reward standout work. Submission points are the floor; the bonus is the ceiling.
+In short: **2 marks** are within reach through consistent submission, and the remaining **2** reward standout work.
 
 ---
 
