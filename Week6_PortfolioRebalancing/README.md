@@ -1,10 +1,5 @@
 # Week 6 · Tutorial 6 · Portfolio Rebalancing
 
-Financial Economics Tutorial
-Abhishek Kashyap · abhishek_k@hs.iitr.ac.in
-
----
-
 ## Overview
 
 This tutorial covers how and when to rebalance a multi-asset portfolio. It uses a three-asset, equal-weighted portfolio of Nifty 50, S&P 500 and a Gold ETF, held from 4 Jan 2010 to 28 Aug 2026.
