@@ -22,16 +22,6 @@ Topics covered:
 | `portfolio-rebalancing.xlsx` | Daily closing prices and the buy-and-hold portfolio |
 | `README.md` | This file |
 
-### Opening the slides
-
-Download `Week6_PortfolioRebalancing.html` and open it in any modern browser (Chrome, Edge, Firefox, Safari). An internet connection is needed to load the fonts and the chart.
-
-| Key | Action |
-|---|---|
-| `←` / `→` | Previous / next slide |
-| `O` | Slide overview |
-| `F` | Fullscreen |
-
 ## Data
 
 The workbook `portfolio-rebalancing.xlsx` contains three sheets:
