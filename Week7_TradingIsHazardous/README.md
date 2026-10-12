@@ -11,6 +11,7 @@ Weeks 3–6 built, measured and rebalanced a long-term portfolio. Week 7 looks a
 ```
 Week7_TradingIsHazardous/
 ├── sl_tradingIsHazardous.html   # interactive lecture slides — the full module
+├── assignmentWeek7.md           # the assignment: summarise the Sharpe and Barber & Odean papers
 ├── readings/                    # the five core readings cited in the slides
 │   ├── 1991-SHARPE-The-arithmetic-of-active-management.pdf
 │   ├── 2000-BARBER_ODEAN-Trading-is-hazardous-to-your-wealth.pdf
